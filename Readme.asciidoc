@@ -1,0 +1,8 @@
+Notes on Various Languagues That I Come Across
+===============================================
+
+Its easy to type something and have stack-overflow give me the answer. But its
+annoying to repeat the same thing every time.  I started religiously taking
+notes of the often asked questions in python and it worked out beautifully,
+improving the speed at which I started writing python scripts. So, here
+is repo that contains notes on other languages
