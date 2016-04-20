@@ -3,6 +3,11 @@ Statments
 
 Better end all statements with a semi-colon;
 
+control statements
+~~~~~~~~~~~~~~~~~~
+
+if ( ) {   } elsif ( ) { } else { }
+
 DataTypes
 ---------
 
@@ -11,6 +16,7 @@ scalars
 Arrays
   @arrname
     @arrname = ( item1, item2, item3 )        #initialialization of array
+    @arrname = ()                             #initialize empty arry
     @arrname = qw/sun mon tue wed/;
     @arrname = (1..20)                        #ranges
     scalar @arrname  -> give len of array
@@ -23,10 +29,26 @@ Arrays
 Hashes
   %varname
     %data = ('John Paul', 45, 'Lisa', 30, 'Kumar', 40);
-
     keys %data => gives a array of the keys
-
     %data = ()  # set ot empty again
+                # notice the % (or @) before var. That's how hash init differs from arr-init. Both empty-literals are ().
+
+    Accessing a hash member:
+      $hashname{'key-literal'}
+      $hashname{$keyHavingVar}
+
+    Does hash have a key:
+
+    if (exists $hash{$key})
+
+    Assigning an array as value to a hash
+      $hashVar{$key} = [@arrayVar];
+      #to-access
+      my @arrayVar = @{$hashVar{$key}};
+      #Note plain assignment, will result in length of array getting stored.
+      $hashVar{$key} = @arrayVar;
+      
+
 
 
 Package
@@ -45,8 +67,22 @@ Strings
 
 @arrname = split('-', $strvar)  .. # will split the string based on sep-char given
 
+concatenate strings
+~~~~~~~~~~~~~~~~~~~
+
+$string = $var1 . $var2 . $var3;
+$string = "${var1}${var2}${var3}";
+$string = "$var1$var2$var3";
+$string = join('', $var1,$var2,$var3);
+$string = sprintf "%s%s%s", $var1, $var2, $var3;
+
+split string
+~~~~~~~~~~~~
+
+my @values = split(',', $data);
+
 to compare strings
--------------------
+~~~~~~~~~~~~~~~~~
 
 if ( $str ne "") {
 }
@@ -60,14 +96,74 @@ General functions
 -----------------
 
 
-sort {CMP_FUNC} LIST {
+sort {CMP_FUNC} LIST
 
+Note: you can use <=> operator for sort keys
+
+if ( $var =~ /REGEX/ ) {
 }
 
-if ( $var =~ /REGEX/  )
+foreach my $index ( @array ) {
+}
+
+break in perl is called last
 
 
 Perl regex:
 -----------
 
 \b  word-end
+
+Files
+------
+
+file for reading
+
+use IO::File;
+my $fd = new IO::File;
+unless( open($fd, "< $file") ){
+    printf("Card $host: Unable to open $file\n");
+    return;
+}
+
+for writing, make it >
+
+
+Passing a has to a sub-routine by reference:
+
+  mysub(\%hash);
+
+  sub mysub {
+    my $params = shift;
+    my %paramhash = %$params;
+  }
+
+If u pass just like that mysub(%hash), then the hash gets flattened out!
+
+Getting keys of a hash in a hash
+keys %{$hashname{level1Key}}
+
+dump a hash
+
+use Data::Dumper;
+
+print Dumper(\%hash);
+
+
+Getting output of a command , subprocess, shell 
+-----------------------------------------------
+
+my $var = `some_shell_command $will_expand_arg literal_arg2`
+my @var = `ls -1`   # auto-collects in a array
+
+
+Argc, argv of commandline
+-------------------------
+
+@ARGV  # Array containing the first arg to last arg.
+$0     # is the name of the current script
+
+Inline replacing a variable with a regex
+----------------------------------------
+
+$variable =~ s/regex/replace/g ;
