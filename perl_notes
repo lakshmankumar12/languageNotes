@@ -1,0 +1,73 @@
+Statments
+---------
+
+Better end all statements with a semi-colon;
+
+DataTypes
+---------
+
+scalars
+  $varname
+Arrays
+  @arrname
+    @arrname = ( item1, item2, item3 )        #initialialization of array
+    @arrname = qw/sun mon tue wed/;
+    @arrname = (1..20)                        #ranges
+    scalar @arrname  -> give len of array
+    $arrname[index]  -> to access one element in the array
+
+    push @array, list
+    pop @array
+    shift @array
+    unshift @array, list
+Hashes
+  %varname
+    %data = ('John Paul', 45, 'Lisa', 30, 'Kumar', 40);
+
+    keys %data => gives a array of the keys
+
+    %data = ()  # set ot empty again
+
+
+Package
+  reference without name using :: operator
+    our varname        # exposes variables in package to use later with pkgname::varname
+
+
+Strings
+-------
+
+"double quote is a simple literal. Interpolation happen $a"
+
+'single quote can
+  spance multi
+  lines.. But no interpolation happens $a'
+
+@arrname = split('-', $strvar)  .. # will split the string based on sep-char given
+
+to compare strings
+-------------------
+
+if ( $str ne "") {
+}
+
+if ( $str eq "hello") {
+}
+
+The == , != try to convert operands to numeric!
+
+General functions
+-----------------
+
+
+sort {CMP_FUNC} LIST {
+
+}
+
+if ( $var =~ /REGEX/  )
+
+
+Perl regex:
+-----------
+
+\b  word-end
