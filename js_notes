@@ -6,6 +6,12 @@ General rules
 Literals
 --------
 
+string literal:
+~~~~~~~~~~~~~~~
+* Strings can be single quotes or double quotes
+* \ escapes. \' and \" respectively escape single and double quote in a double and single quote string. 
+* double/single is automatically escaped in single/double quote string.
+
 * In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen
 
 Constructs
@@ -29,6 +35,13 @@ while (expression) {
 
 }
 
+Functions
+-----------
+
+function FunctionName () {
+
+    return variable;
+} <- No semi-colon
 
 
 Basic Types
@@ -113,3 +126,30 @@ $("#id_name").append(htmlContent);
 
 Global object
 -------------
+
+**** 
+
+document object refers to the full html document we are rendering
+window is a much higher global object.
+
+***
+
+Js functions in a browser
+--------------------------
+
+getElementsByTagName
+
+HTML Div events
+---------------
+
+<div onclick="message('hi')">
+onmouseover
+onresize
+onload
+
+
+
+**** 
+
+Course-notes:
+
