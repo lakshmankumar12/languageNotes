@@ -65,6 +65,8 @@ var i, j int = 1, 2
 k := 3
 c, python, java := true, false, "no!"
 ----
++
+* var statements can also be factored like import statements
 
 Basic Types
 ^^^^^^^^^^^
@@ -194,7 +196,7 @@ Pointer
   variable's pointer, and *var is for deferencing or indirecting. However,
   there is no pointer arithmetic in go.
 
-Structs
+structs
 ~~~~~~~
 
 * A struct is a collection of fields. Fields are accessed using dot
@@ -209,6 +211,55 @@ type Vertex struct {
 * To access the field X of a struct when we have the struct pointer p we could
   write (*p).X. However, that notation is cumbersome, so the language permits
   us instead to write just p.X, without the explicit dereference.
+* Struct literal is much like c
+
+arrays
+~~~~~~
+
+* [n]T is an array of n values of type T
++
+----
+func main() {
+    var a [2]string
+    a[0] = "Hello"
+    a[1] = "World"
+    fmt.Println(a[0], a[1])
+    fmt.Println(a)
+
+    primes := [6]int{2, 3, 5, 7, 11, 13}
+    auto_size_detected_array := [...]int{2, 3, 5, 7, 11, 13}
+    fmt.Println(primes)
+}
+----
++
+* Go's array are values. Think of it as struct with indexed members. Passing
+  arrays to function will pass entire copies. (No decaying of name to pointer)
+
+slices
+~~~~~~
+
+* An array has a fixed size. A slice, on the other hand, is a
+  dynamically-sized, flexible view into the elements of an array. In practice,
+  slices are much more common than arrays.
+* The type []T is a slice with elements of type T.
+* This expression creates a slice of the first five elements of the array a
++
+----
+ a[0:5]
+----
++
+* A slice does not store any data, it just describes a section of an underlying
+  array.  Changing the elements of a slice modifies the corresponding elements
+  of its underlying array.  Other slices that share the same underlying array
+  will see those changes.
+* Slice - len and cap
+* Can be created with a built-in function - make. Note the odditity. The first
+  args is a type-name (and not a var-name)
++
+----
+func make([]T, len, cap) []T
+----
+
 
 Managing Go code
 ----------------
