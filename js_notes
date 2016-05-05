@@ -8,11 +8,42 @@ Literals
 
 string literal:
 ~~~~~~~~~~~~~~~
+
 * Strings can be single quotes or double quotes
 * \ escapes. \' and \" respectively escape single and double quote in a double and single quote string. 
 * double/single is automatically escaped in single/double quote string.
 
-* In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen
+object literal
+~~~~~~~~~~~~~~
+
+* In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen. Otherwise string can be omitted.
+* Empty string is a property too
+* Properties are separated by spaces
+* Objects can nest
+
+----
+var flight= {
+  airline: "Oceanic",
+  number: 815,
+  departure: {
+    IATA: "SYD",
+    time: "2004-09-22 14:55",
+    city: "Sydney"
+  },
+  arrival: {
+    IATA: "LAX",
+    time: "2004-09-23 10:42",
+    city: "Los Angeles"
+  }
+};
+----
+
+regex literal
+~~~~~~~~~~~~~
+
+----
+/ ... /
+----
 
 Constructs
 ----------
@@ -43,6 +74,10 @@ function FunctionName () {
     return variable;
 } <- No semi-colon
 
+* No return statement, then return undefined
+* No overloading. Last definition overrides other definitions
+* arguments is like a array that can access function args w/o naming them
+
 
 Basic Types
 -----------
@@ -61,23 +96,34 @@ Arrays
  -> array.join(" ")  // Uses arg to build a string
 
 Objects
-  -> dictionary of name/value pairs called properties
-  -> Properties
-    -> Attributes
-      -> writable
-      -> enumerable
-      -> configurable
-    -> prototype, class, extensible-flag
-    -> own(directly-defined)/inherited(defined in prototype)
-  -> types
-    -> native objects
-      -> arrays, functions, dates, regex
-    -> host objects
-      -> HTMLElement objects
-    -> user-defined
-  -> Creation
-    -> object literal. type will be Object
-    -> new Constructor(). type will be Constructor. Inside you can set o.prototype = Something. If unset, this will be Constructor.prototype
+~~~~~~~~
+
+* dictionary of name/value pairs called properties
+* Properties
+** Attributes
+*** writable
+*** enumerable
+*** configurable
+** prototype, class, extensible-flag
+*** own(directly-defined)/inherited(defined in prototype)
+* types
+** native objects
+*** arrays, functions, dates, regex
+** host objects
+*** HTMLElement objects
+** user-defined
+*** Creation
+**** object literal. type will be Object
+**** new Constructor(). type will be Constructor. Inside you can set o.prototype = Something. If unset, this will be Constructor.prototype
+
+Attempting to retrieve values from undefined will throw a TypeError exception. This can be guarded against with the && operator
++
+----
+    flight.equipment                               // undefined
+    flight.equipment.model                         // throw "TypeError"
+    flight.equipment && flight.equipment.model     // undefined
+----
+
 
 Null/Undefined
 --------------
@@ -94,11 +140,12 @@ var a = new Car();
 Useful functions
 -------
 
-* parseInt(), parseFloat()
+* anyobject.hasOwnProperty("property")
+* anyobject.isPrototypeOf(object)
+* anyobject.properyIsEnumerable("property")
 * anyobject.toString()
 * anyobject.valueOf()
-* anyobject.hasOwnProperty("property")
-* anyobject.properyIsEnumerable("property")
+* parseInt(), parseFloat()
 * Object.getOwnPropertyDescriptor(object, "property")
 * Object.defineProperty(object, { value: ".." , writable: true/false, enumerable: true/false, configurable: true/false } )
 * object.isFunction
@@ -149,7 +196,7 @@ onload
 
 
 
-**** 
+****
 
 Course-notes:
 
