@@ -83,17 +83,33 @@ Basic Types
 -----------
 
 Primitive Types
- -> Number
- -> strings
- -> booleans
- -> null
+* Number
+* strings
+* booleans
+* null
+
+Native Objects
+--------------
+
+* provided by the EMEA implementation. Always available
 
 Arrays
- -> 0 indexed.
- -> array.length
- -> array.push(obj)  // Adds a element at end of array
- -> array.pop()      // Removes a element at beg of array
- -> array.join(" ")  // Uses arg to build a string
+~~~~~~
+
+* 0 indexed.
+* array.length     // Its a property, so no paranthesis
+* array.push(obj)  // Adds a element at end of array
+* array.pop()      // Removes a element at beg of array
+* array.join(" ")  // Uses arg to build a string
+* array.split( )
+* array.concat( )
+* array.slice( )
+* array.push()
+* array.pop()
+
+Date
+~~~~~
+
 
 Objects
 ~~~~~~~~
