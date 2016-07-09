@@ -114,7 +114,8 @@ Objects
 ** user-defined
 *** Creation
 **** object literal. type will be Object
-**** new Constructor(). type will be Constructor. Inside you can set o.prototype = Something. If unset, this will be Constructor.prototype
+**** new Constructor(). type will be Constructor. 
+     Inside you can set o.prototype = Something. If unset, it will be Constructor.prototype
 
 Attempting to retrieve values from undefined will throw a TypeError exception. This can be guarded against with the && operator
 +
@@ -124,6 +125,12 @@ Attempting to retrieve values from undefined will throw a TypeError exception. T
     flight.equipment && flight.equipment.model     // undefined
 ----
 
+
+Prototype/Contructor/__proto__ relations:
+-----------------------------------------
+
+See picture @ http://stackoverflow.com/questions/9959727/proto-vs-prototype-in-javascript
+Read at https://blog.pivotal.io/labs/labs/javascript-constructors-prototypes-and-the-new-keyword
 
 Null/Undefined
 --------------
