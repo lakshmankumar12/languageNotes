@@ -67,12 +67,13 @@ c, python, java := true, false, "no!"
 ----
 +
 * var statements can also be factored like import statements
+* _ can be used in place where a variable name isn't required.
 
 Basic Types
 ^^^^^^^^^^^
 
 ----
-bool
+bool  // either true or false
 string
 int  int8  int16  int32  int64
 uint uint8 uint16 uint32 uint64 uintptr
@@ -87,6 +88,36 @@ complex64 complex128
 * Constants are declared like variables, but with the const keyword. Constants
   can be character, string, boolean, or numeric values. Constants cannot be
   declared using the := syntax.
+
+constants
+^^^^^^^^^
+
+* can be nubmers, strings or booleans
+* iota is used for enumeration
+
+const (
+    a = iota
+    b           /* implicit iota */
+)
+
+strings
+^^^^^^^
+
+* always utf-8
+* enclsoed in double quotes
+* single-quote strings represent one utf-8 character ( actually this is referred as rune)
+* strings are immutable
+* to edit strings, convert to array of runes
+* backticks are for raw string literals that span multi-line.
+
+----
+s := "hello"               /* string */
+c := []rune(s)             /* covert to array of runes */
+c[0] = 'c'                 /* modify */
+s2 := string(c)            /* covert array of runes to string */
+fmt.Printf("%s\n", s2)
+----
+
 
 Flow control statements: for, if, else, switch and defer
 --------------------------------------------------------
@@ -125,6 +156,8 @@ main() {
     fmt.Println(sum)
 }
 ----
++
+* Variables declared in for's initialization part have loop's scope
 
 if
 ~~~~
@@ -234,6 +267,7 @@ func main() {
 +
 * Go's array are values. Think of it as struct with indexed members. Passing
   arrays to function will pass entire copies. (No decaying of name to pointer)
+* len(array) gives its length
 
 slices
 ~~~~~~
@@ -260,6 +294,34 @@ slices
 func make([]T, len, cap) []T
 ----
 
+map
+~~~~
+
+* Basically an unordered key-value hash-map
+* Keys are any type on which == works. Value can be anything
+
+Popular types/interfaces
+-------------------------
+
+error
+~~~~~~
+
+nil is no error. Otherwise some error
+
+Other Go statements
+-------------------
+
+range
+~~~~~
+
+Typically used in for statements. Is like an iterator. Gives 0-based-index, value
+
+----
+for i := 1; i < len(os.Args); i++ {
+   s += sep + os.Args[i]
+   sep = " "
+}
+----
 
 Managing Go code
 ----------------
@@ -273,13 +335,49 @@ Managing Go code
 Useful Statements
 -----------------
 
-Printing
 
+Packages in standard library
+-----------------------------
+
+os
+~~~
+
+* os.Args[] - slice of cmd line args. os.Args[0] is the command itself.
+* os.Stdin  - a io.Reader for stdin
+* os.Open   - opens a file! Check the err first and then use the File*
+
+fmt
+~~~
+
+* fmt.Println
+* fmt.Printf
++
 ----
 fmt.Println(split(17))
 var i int
 fmt.Println(i, c, python, java)
+
+fmt.Printf("Regular c style printing with formats:%d", i)
 ----
++
+** %v is verb(name in go for format-specifier) to choose the default format for the passed type
+
+strings
+~~~~~~~
+
+* strings.Join(a []string, sep string)
+** concatenates elements of a to make a bing string using sep
+
+bufio
+~~~~~
+
+* Scanner
+** Reads a input and breaks it into lines
+** Scanner.Scan() - reads one line, strips the newline. Returns True/false on whether a line was read or not.
+** Scanner.Text() - gets the line previous read by Scan()
+
+* bufio.NewScanner
+** returns a *Scanner from a io.Reader
 
 
 Read later
