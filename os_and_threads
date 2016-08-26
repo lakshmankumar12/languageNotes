@@ -68,3 +68,11 @@ read-write-locks
 ----------------
 
 pthread_rwlock_t
+
+
+Difference between select/poll
+-------------------------------
+
+Good write up [here]https://daniel.haxx.se/docs/poll-vs-select.html
+
+Dev-poll splites the telling of which fd's and actual waiting into 2 sys-calls.
