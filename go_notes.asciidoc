@@ -20,6 +20,7 @@ import (
 ----
 +
 * In Go, a name is exported if it begins with a capital letter.
+* when doing a import "a/b", we can later just do b.VarFromB
 * Function calls can precede function definition within the package
 
 Functions
@@ -42,6 +43,7 @@ x, y int
 ----
 +
 * Naked returns (to be avoided)
+** This simply returns the variable with same name as parameters
 +
 ----
 func split(sum int) (x, y int) {
@@ -50,6 +52,26 @@ func split(sum int) (x, y int) {
     return
 }
 ----
++
+* functions associated with types are called methods
+
+go inbuilt functions
+^^^^^^^^^^^^^^^^^^^^
+
+* make
+** used to create a slice, map, chan
+* len
+* cap
+* new
+* append
+* copy
+* close
+* delete
+* complex
+* real
+* imag
+* panic
+* recover
 
 Variables
 ~~~~~~~~~
@@ -69,6 +91,8 @@ c, python, java := true, false, "no!"
 +
 * var statements can also be factored like import statements
 * _ can be used in place where a variable name isn't required.
+* for all names, case matters. HeapSort and heapSort are different.
+* Go typically uses camel case. Abbreviations may be all-caps.
 
 Basic Types
 ^^^^^^^^^^^
@@ -94,6 +118,7 @@ constants
 ^^^^^^^^^
 
 * can be nubmers, strings or booleans
+* can be package level or function level
 * iota is used for enumeration
 
 const (
@@ -175,6 +200,14 @@ func pow(x, n, lim float64) float64 {
         return v
     }
     return lim
+}
+----
++
+* combine a stmt and err check like this, limiting the err's scope
++
+----
+if err := r.ParseForm(); err != nil {
+   log.Print(err)
 }
 ----
 
@@ -302,6 +335,35 @@ map
 * Basically an unordered key-value hash-map
 * Keys are any type on which == works. Value can be anything
 
+channel
+~~~~~~~
+
+* communication mechanism
+* Is always of a given type
+
+goroutine
+~~~~~~~~~
+
+* concurrent function execution
+* go statement creates it
+
+interface
+~~~~~~~~~~
+
+* Collection of methods
+
+composite literal
+~~~~~~~~~~~~~~~~~
+
+* Not exactly a type, but I just put here
+* Initializes a slice or a struct
++
+----
+var palette = []color.Color{color.White, color.Black}
+anim := gif.GIF{LoopCount: nframes}
+----
+
+
 Popular types/interfaces
 -------------------------
 
@@ -347,6 +409,7 @@ os
 * os.Args[] - slice of cmd line args. os.Args[0] is the command itself.
 * os.Stdin  - a io.Reader for stdin
 * os.Open   - opens a file! Check the err first and then use the File*
+* os.Exit(1) - exit with a error code.
 
 fmt
 ~~~
@@ -388,6 +451,39 @@ io/ioutil
 * ReadFile
 ** Given a filename returns byte slice/err of file contents
 
+io
+~~~
+
+* Discard - sth like /dev/null sink
+
+net/http
+~~~~~~~~
+
+* http.Get(url) resp,err
+
+time
+~~~~
+
+* time.Now()
+* Time - unexported type for Time
+* Duration - nano-sec between 2 instances (upto 290 years)
+
+sync
+~~~~
+
+* sync.Mutex - mutex TYPE
+
+Reading Help
+------------
+
+* use godoc
++
+----
+godoc <pkg-name>
+godoc image/gif
+----
++
+* Has CONSTANTS, FUNCTIONS, TYPES
 
 Read later
 ----------
