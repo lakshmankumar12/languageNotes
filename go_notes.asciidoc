@@ -20,6 +20,7 @@ import (
 ----
 +
 * In Go, a name is exported if it begins with a capital letter.
+* Function calls can precede function definition within the package
 
 Functions
 ~~~~~~~~~
@@ -109,6 +110,7 @@ strings
 * strings are immutable
 * to edit strings, convert to array of runes
 * backticks are for raw string literals that span multi-line.
+* string(byteslice) coverts a byte slice to a string
 
 ----
 s := "hello"               /* string */
@@ -351,6 +353,7 @@ fmt
 
 * fmt.Println
 * fmt.Printf
+* fmt.Fprintf
 +
 ----
 fmt.Println(split(17))
@@ -378,6 +381,12 @@ bufio
 
 * bufio.NewScanner
 ** returns a *Scanner from a io.Reader
+
+io/ioutil
+~~~~~~~~~~
+
+* ReadFile
+** Given a filename returns byte slice/err of file contents
 
 
 Read later
