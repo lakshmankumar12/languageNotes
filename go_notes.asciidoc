@@ -6,8 +6,7 @@ Packages, Variables and Functions
 Packages
 ~~~~~~~~
 
-* Every Go program is made up of packages.
-  Programs start running in package main.
+* Every Go program is made up of packages. Programs start running in package main.
 * By convention, the package name is the same as the last element of the import path
 * imports can be grouped into a parenthesized, "factored" import statement.
   This is preferred over individual imports.
@@ -21,7 +20,11 @@ import (
 +
 * In Go, a name is exported if it begins with a capital letter.
 * when doing a import "a/b", we can later just do b.VarFromB
+  (open question: what if i have x/b and y/b packages?)
 * Function calls can precede function definition within the package
+* init() is a special no-arg, no-return-type function that can appear any number of times
+  in every file, in any package. These are called in declaraion order and are invoked
+  before the package is considered initialized.
 
 Functions
 ~~~~~~~~~
@@ -55,7 +58,7 @@ func split(sum int) (x, y int) {
 +
 * functions associated with types are called methods
 
-go inbuilt functions
+go builtin functions
 ^^^^^^^^^^^^^^^^^^^^
 
 * make
@@ -63,6 +66,10 @@ go inbuilt functions
 * len
 * cap
 * new
+** new(T) creates a unnamed variable of type T, initializes it to zero-value, and returns T*
+** new is only a syntactic convenience, and avoids having to create a name. (Different from
+   c/cpp in this regard. In go, every variable is like from heap (compiler chooses stack/heap 
+   depending on how its used)
 * append
 * copy
 * close
@@ -93,6 +100,13 @@ c, python, java := true, false, "no!"
 * _ can be used in place where a variable name isn't required.
 * for all names, case matters. HeapSort and heapSort are different.
 * Go typically uses camel case. Abbreviations may be all-caps.
+
+scope
+^^^^^^
+
+* very different from that of c.
+* pointers to local variables can be passed back. (very different from c/cpp)
+* each function invocation will result in a different local-variable pointer.
 
 Basic Types
 ^^^^^^^^^^^
@@ -334,6 +348,7 @@ map
 
 * Basically an unordered key-value hash-map
 * Keys are any type on which == works. Value can be anything
+* Retrival gives 2 restuls - value, ok
 
 channel
 ~~~~~~~
@@ -361,6 +376,45 @@ composite literal
 ----
 var palette = []color.Color{color.White, color.Black}
 anim := gif.GIF{LoopCount: nframes}
+----
+
+Reference types
+~~~~~~~~~~~~~~~
+
+* maps, channels, slices are reference-types. When you pass these in functions,
+  you pass a reference to them. So, there are multiple references of them pointing
+  to the same underlying type.
+* structures, arrays, interfaces that contain reference-type also kind of become
+  referenced.
+
+type declaration
+~~~~~~~~~~~~~~~~
+
+Used to create new types from existing types - although they share same representation
+they are different types
+
+----
+type newTypeName underlyingType
+type Celcius float64
+----
+
+Explicity type conversion is then used to covert one to another. Initialization however
+can be direct
+
+----
+const boilingPoint Celcius = 100.0
+var freezingPoint Celcius
+freezingPoint = Celcius(someFloatVar)
+----
+
+
+type-assertion
+~~~~~~~~~~~~~~~
+
+Not sure.. To read more on this
++
+----
+v, ok = varName.(T)
 ----
 
 
@@ -394,6 +448,8 @@ Managing Go code
 * A workspace contains many version control repositories (managed by Git, for example).
 * Each repository contains one or more packages.
 * Each package consists of one or more Go source files in a single directory.
+  (open question: how does go compiler know where to look for when a variable is
+   not available in this file, but another file belonging to the same package?)
 * The path to a package's directory determines its import path.
 
 Useful Statements
@@ -427,6 +483,11 @@ fmt.Printf("Regular c style printing with formats:%d", i)
 ----
 +
 ** %v is verb(name in go for format-specifier) to choose the default format for the passed type
+
+log
+~~~~
+
+log.Fatalf - printf and then exit
 
 strings
 ~~~~~~~
@@ -465,7 +526,7 @@ time
 ~~~~
 
 * time.Now()
-* Time - unexported type for Time
+* Time - details unexported type for Time
 * Duration - nano-sec between 2 instances (upto 290 years)
 
 sync
@@ -481,9 +542,24 @@ Reading Help
 ----
 godoc <pkg-name>
 godoc image/gif
+godoc time.Now  # doesn't work in my m/c though. But good
 ----
 +
 * Has CONSTANTS, FUNCTIONS, TYPES
+
+Stuff not available in go
+------------------------
+
+* no implicit numer conversions
+* no constructors or destructors
+* no operator overloading
+* no default parameter values
+* no inheritance
+* no generics
+* no exceptions
+* no macros
+* no function annotations
+* no thread-local storage
 
 Read later
 ----------
