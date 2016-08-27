@@ -16,11 +16,13 @@ import (
     "fmt"
     "math"
 )
+import myhttp "mypath/http"
 ----
 +
-* In Go, a name is exported if it begins with a capital letter.
-* when doing a import "a/b", we can later just do b.VarFromB
-  (open question: what if i have x/b and y/b packages?)
+* In Go, a name is exported if it begins with a capital letter. Otherwise its private
+  to the package its in.
+* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
+  package in "a/b" would have been named b
 * Function calls can precede function definition within the package
 * init() is a special no-arg, no-return-type function that can appear any number of times
   in every file, in any package. These are called in declaraion order and are invoked
@@ -96,6 +98,7 @@ make (map[T1] T2)
    unavailable sizes too
 * close
 * delete
+** used to delete a key in a map
 * complex
 * real
 * imag
