@@ -57,12 +57,21 @@ func split(sum int) (x, y int) {
 ----
 +
 * functions associated with types are called methods
+* variadic function have ellipsis at the last arg.
 
 go builtin functions
 ^^^^^^^^^^^^^^^^^^^^
 
 * make
 ** used to create a slice, map, chan
++
+----
+// args to make in T is the type name itself
+make ([]T, len, cap) T[]
+make (chan T)
+make (map[T1] T2)
+----
++
 * len
 * cap
 * new
@@ -71,7 +80,20 @@ go builtin functions
    c/cpp in this regard. In go, every variable is like from heap (compiler chooses stack/heap 
    depending on how its used)
 * append
+** adds an element to a slice. If slice has capacity, its very fast. If slice capacity doesn't
+   fit, it creates a new array, copies existing elems and then appends.
+** Never forget to assign the result of append back to the original varaible, as it could have
+   changed.
++
+----
+   runes = append(runes, r)
+----
++
 * copy
+** copies from one slice to another of same len.
+** Safe against overlapping slices.
+** Returns number of elements actually copied - the smaller of the 2 slices. So its safe againt
+   unavailable sizes too
 * close
 * delete
 * complex
@@ -86,6 +108,8 @@ Variables
 * Initialization using the var statement. This is possible both inside functions and in global scope
 +
 ----
+var name type = expression
+name := expression
 var i, j int = 1, 2
 ----
 +
@@ -124,21 +148,29 @@ complex64 complex128
 ----
 
 * Variables w/o Initialization is set to 0/false/empty-string
-* Constants are declared like variables, but with the const keyword. Constants
-  can be character, string, boolean, or numeric values. Constants cannot be
-  declared using the := syntax.
+* Note, there is only one basic type which is a pointer.
+  This is big enuf to hold any poitner.
 
 constants
 ^^^^^^^^^
 
-* can be nubmers, strings or booleans
+* Constants are declared like variables, but with the const keyword. Constants
+  can be character, string, boolean, or numeric values. Constants cannot be
+  declared using the := syntax.
+* Type info can be absent in the const declaration. In this case, its derived
+  from the literal. Or if we have a typename (typically from type declaration,
+  it can be used too). When type is absent, its untyped. So its of any one
+  flavor - boolean, int, rune, floating-point, complex, string.
 * can be package level or function level
 * iota is used for enumeration
 
+----
 const (
     a = iota
     b           /* implicit iota */
 )
+----
+
 
 strings
 ^^^^^^^
@@ -147,17 +179,23 @@ strings
 * enclsoed in double quotes
 * single-quote strings represent one utf-8 character ( actually this is referred as rune)
 * strings are immutable
-* to edit strings, convert to array of runes
+* to edit strings, convert to slice of runes
 * backticks are for raw string literals that span multi-line.
 * string(byteslice) coverts a byte slice to a string
 
 ----
 s := "hello"               /* string */
-c := []rune(s)             /* covert to array of runes */
+c := []rune(s)             /* covert to slice of runes */
 c[0] = 'c'                 /* modify */
-s2 := string(c)            /* covert array of runes to string */
+s2 := string(c)            /* covert slice of runes to string */
 fmt.Printf("%s\n", s2)
 ----
+
+* Watch out, string indexing doesn't give the rune, but the byte! In fact len(str) is
+  also total bytes, not runes. However range on a string works over runes
+* The above isn't usually a problem to iterate over a string comparing it to individual
+  runes(Atleast the ascii ones), as the non-ascii ones anyway dont compare equal.
+* Inside a program, you can covert a string(utf-8 encoded) to slice of runes
 
 
 Flow control statements: for, if, else, switch and defer
@@ -277,6 +315,7 @@ Pointer
 * Like c, * is used for type. *T is a pointer of type T. & is for getting a
   variable's pointer, and *var is for deferencing or indirecting. However,
   there is no pointer arithmetic in go.
+* Its okay to take pointers to struct members
 
 structs
 ~~~~~~~
@@ -294,6 +333,16 @@ type Vertex struct {
   write (*p).X. However, that notation is cumbersome, so the language permits
   us instead to write just p.X, without the explicit dereference.
 * Struct literal is much like c
+* Capital letter rules follow for struct too. If the struct type name is
+  capitalized, the type is exported. If the individual members are caps, they
+  are exported. A struct can have mix of exported and non-exported members.
+* struct literal is of two type
++
+----
+type Point struct { X, Y  int }
+Point{1,2}
+Point{X:1, Y:2}
+----
 
 arrays
 ~~~~~~
@@ -316,7 +365,12 @@ func main() {
 +
 * Go's array are values. Think of it as struct with indexed members. Passing
   arrays to function will pass entire copies. (No decaying of name to pointer)
+* array literals are like [n]type{val1,val2,..}. The n can be (...) in which
+  case its auto derived.
 * len(array) gives its length
+* (Yet to grasp this fully: Be wary of saying/mentioning arrays in go. May be
+  the slice is more appropriate). Note that []T is a slice of T, not array of T,
+  but [n]T is an array.
 
 slices
 ~~~~~~
@@ -325,9 +379,15 @@ slices
   dynamically-sized, flexible view into the elements of an array. In practice,
   slices are much more common than arrays.
 * The type []T is a slice with elements of type T.
-* This expression creates a slice of the first five elements of the array a
+* Slice - ptr, len and cap and has the underlying array. len is the number of
+  slice elements, cap is the number of elems in underlying array from the loc
+  where ptr is pointing. Always len <= cap
+* sequence is a term that can indexible. (its either a slice, array or ptr to
+  array). slice-operator on a sequence produces a slice. This expression creates 
+  a slice of the first five elements of the sequence a.
 +
 ----
+ a[i:j]  // 0 <= i <= j <= cap(a). resulting slice has j-1 elements
  a[0:5]
 ----
 +
@@ -335,20 +395,28 @@ slices
   array.  Changing the elements of a slice modifies the corresponding elements
   of its underlying array.  Other slices that share the same underlying array
   will see those changes.
-* Slice - len and cap
+* slice with no underlying array is nil. This is the zero value for a slice
 * Can be created with a built-in function - make. Note the odditity. The first
-  args is a type-name (and not a var-name)
+  args is a type-name (and not a var-name). This creates a unnamed array and
+  then returns a slice to that array. The returned slice is the only way
+  to access that array
 +
 ----
 func make([]T, len, cap) []T
 ----
++
 
 map
 ~~~~
 
 * Basically an unordered key-value hash-map
-* Keys are any type on which == works. Value can be anything
+* Keys are any type on which == works. Value can be anything. == is good to
+  for for integer, boolean, string, rune. Not == is bad for float(Nan). (Complex?)
+  If a struct is absolutely just made of the above (to any depth) that is good
+  for equivality too.
 * Retrival gives 2 restuls - value, ok
+* Map created with make(map[K] V) or using map literal.
+* We can't get address to a map. However the map is itself a reference type.
 
 channel
 ~~~~~~~
@@ -381,11 +449,20 @@ anim := gif.GIF{LoopCount: nframes}
 Reference types
 ~~~~~~~~~~~~~~~
 
-* maps, channels, slices are reference-types. When you pass these in functions,
-  you pass a reference to them. So, there are multiple references of them pointing
-  to the same underlying type.
+* maps, channels, slices, pointers, functions are reference-types. When you pass
+  these in functions, you pass a reference to them. So, there are multiple references
+  of them pointing to the same underlying type.
 * structures, arrays, interfaces that contain reference-type also kind of become
   referenced.
+
+Aggregate type
+~~~~~~~~~~~~~~
+
+* arrays and structs
+
+Interface types
+~~~~~~~~~~~~~~~
+
 
 type declaration
 ~~~~~~~~~~~~~~~~
@@ -407,6 +484,16 @@ var freezingPoint Celcius
 freezingPoint = Celcius(someFloatVar)
 ----
 
+Type names from basic-types are referred as named basic types. Eg. time.Duration
+
+type-convertion
+~~~~~~~~~~~~~~~~
+
+* T(value) converts value to the type T
++
+----
+[]rune("Hello World")
+----
 
 type-assertion
 ~~~~~~~~~~~~~~~
@@ -435,9 +522,9 @@ range
 Typically used in for statements. Is like an iterator. Gives 0-based-index, value
 
 ----
-for i := 1; i < len(os.Args); i++ {
-   s += sep + os.Args[i]
-   sep = " "
+var a := { 1,2,3}
+for i,v := range a {
+  fmt.Println("%d %d",i,v)
 }
 ----
 
@@ -482,7 +569,13 @@ fmt.Println(i, c, python, java)
 fmt.Printf("Regular c style printing with formats:%d", i)
 ----
 +
-** %v is verb(name in go for format-specifier) to choose the default format for the passed type
+** %v is verb(name in go for format-specifier) to choose the default format for the
+   passed type
+*** %#v adverb will make it print in Go's syntax
+** %x for strings prints 2-hex-digits for each byte in string. An option space(adverb
+   in go) adds a space between each byte.
+** %x for []runes prints the runes in utf encoded hex values
+
 
 log
 ~~~~
@@ -494,6 +587,21 @@ strings
 
 * strings.Join(a []string, sep string)
 ** concatenates elements of a to make a bing string using sep
+* strings.LastIndex
+
+bytes
+~~~~~~
+
+* bytes.Buffer - efficient type for manipulation of []byte
+
+strconv
+~~~~~~~~
+
+unicode/utf8
+~~~~~~~~~~~~
+
+* utf8.DecodeRuneInString - gets rune at a index i
+* utf8.RuneCountInString
 
 bufio
 ~~~~~
