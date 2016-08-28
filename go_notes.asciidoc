@@ -32,6 +32,12 @@ import myhttp "mypath/http"
 Functions
 ~~~~~~~~~
 
+----
+func name(parameter-list) (result-list) {
+  body
+}
+----
+
 * 0 or more args. 0 or more return values
 +
 ----
@@ -60,7 +66,11 @@ func split(sum int) (x, y int) {
 ----
 +
 * functions associated with types are called methods
-* variadic function have ellipsis at the last arg.
+* variadic function have ellipsis at the last arg's type.
+  This makes the funciton take any number of args of that type.
+  Internally its accessible as a slice of that type.
+** ...interface{} makes the funciton take any type of arg any
+  number of times.
 
 go builtin functions
 ^^^^^^^^^^^^^^^^^^^^
@@ -105,6 +115,7 @@ make (map[T1] T2)
 * real
 * imag
 * panic
+** Takes any arg
 * recover
 
 Variables
@@ -334,7 +345,8 @@ Pointers
 structs
 ~~~~~~~
 
-* A struct is a collection of fields. Fields are accessed using dot
+* A struct is a collection of fields. Fields are accessed using dot. (dot
+  is called selector in go. It selects which field or method to use)
 +
 ----
 type Vertex struct {
@@ -363,6 +375,26 @@ Point{X:1, Y:2}
   make function call be a L-value
 * Struct can't have the same struct inside, but have a pointer of itself. (
   like c)
+* Structs can embed other structures inside (anonyomous members). This has
+  benefit of accessing members directly + invoking methods of the embedded
+  type directly. However, this implicit behavior as receiver is only
+  limited to receiver. We cant pass as args the outer Type, where embedded
+  type is expected.
+* Structs can have field-tags. These are any literal string. One eg is the
+  $$`json: "json_field_name"`$$
+
+methods
+^^^^^^^
+
+* The object on which method is called is referred as receiver
+* We can define methods for any type (basic-types, named-types, slices, maps)
+  We can't however define methods for pointers and interfaces. (Pointer methods
+  are treated as methods of the pointed-type itself)
+* methods can be defined only in the same package where the type is defined.
+* by convention either declarei all methods on type or on pointer. Only pointer
+  methods can change the receiver though.
+* its okay for a receiver to be nil
+
 
 arrays
 ~~~~~~
@@ -656,11 +688,22 @@ time
 * time.Now()
 * Time - details unexported type for Time
 * Duration - nano-sec between 2 instances (upto 290 years)
+* time.Sleep(d Duration)
 
 sync
 ~~~~
 
 * sync.Mutex - mutex TYPE
+
+regex
+~~~~~
+
+json
+~~~~~
+
+* json.Marshall
+* json.MarshallIndent
+* json.Unmarshall  -- ignores json fields which aren't in the struct declaration
 
 Go Tools
 --------
