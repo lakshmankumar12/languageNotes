@@ -23,7 +23,8 @@ import myhttp "mypath/http"
   to the package its in.
 * when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
   package in "a/b" would have been named b
-* Function calls can precede function definition within the package
+* Function calls can precede function declaraion within the package. Unlike c, there is
+  no declaration/definition distinction. Its just one place and go calls it declaration.
 * init() is a special no-arg, no-return-type function that can appear any number of times
   in every file, in any package. These are called in declaraion order and are invoked
   before the package is considered initialized.
@@ -116,7 +117,8 @@ name := expression
 var i, j int = 1, 2
 ----
 +
-* Using the := construct, var is skipped and type is assumed.
+* Using the := construct, var is skipped and type is assumed. This also help in initializing variables
+  of different types in same statement. So (:=) is for declaration and (=) is assignment.
 +
 ----
 k := 3
@@ -127,6 +129,11 @@ c, python, java := true, false, "no!"
 * _ can be used in place where a variable name isn't required.
 * for all names, case matters. HeapSort and heapSort are different.
 * Go typically uses camel case. Abbreviations may be all-caps.
+* Multiple assignmenents are done in one go. 
++
+----
+i , j = j , i  // swap i and j
+----
 
 scope
 ^^^^^^
