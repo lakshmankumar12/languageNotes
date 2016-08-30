@@ -124,8 +124,10 @@ Variables
 * Initialization using the var statement. This is possible both inside functions and in global scope
 +
 ----
-var name type = expression
-name := expression
+var name type = expression        // Everything present
+var name = expression             // type is inferred from expression
+name := expression                // var keyword ommited because of := short-hand. type also ommited
+
 var i, j int = 1, 2
 ----
 +
