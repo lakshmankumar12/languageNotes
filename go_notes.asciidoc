@@ -548,6 +548,11 @@ type-convertion
 ----
 []rune("Hello World")
 ----
++
+* Usually a new type is same as the other type, but defines extra methods so
+  that it can be passed as interfaces. In such cases, you will see these
+  type conversions done from type X to Y (although both types are internally
+  same)
 
 type-assertion
 ~~~~~~~~~~~~~~~
@@ -696,6 +701,13 @@ sync
 ~~~~
 
 * sync.Mutex - mutex TYPE
+
+sort
+~~~~~
+
+* sort.Interface
+** Needs Len, Less, Swap
+* sort.Reverse
 
 regex
 ~~~~~
