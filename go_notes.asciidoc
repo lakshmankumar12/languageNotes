@@ -747,6 +747,15 @@ json
 Go Tools
 --------
 
+go build        // creates a exe in same dir.
+go run file.go  // Just run as a script
+go install      // build, but put exe in $GOPATH/bin
+
+go test path1/path2/a.go   // Not sure. check
+
+go fmt          // formats a file
+go get abc.com/repo_name/path/file.go  // pulls that file (repo) in $GOPATH/src
+
 vim
 ~~~~
 
