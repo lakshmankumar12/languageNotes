@@ -126,6 +126,7 @@ Variables
 ----
 var name type = expression        // Everything present
 var name = expression             // type is inferred from expression
+var name type                     // zero-initialized name for that type
 name := expression                // var keyword ommited because of := short-hand. type also ommited
 
 var i, j int = 1, 2
@@ -395,6 +396,9 @@ methods
 * methods can be defined only in the same package where the type is defined.
 * by convention either declarei all methods on type or on pointer. Only pointer
   methods can change the receiver though.
+** Compiler will implicitly make a T as *T if only *T is a receiver. However,
+   when T is passed as-is as interface{} (Like to fmt.Printf), then there is
+   no implicit conversion! So (*T).String() may not work!
 * its okay for a receiver to be nil
 
 
@@ -488,6 +492,11 @@ interface
 ~~~~~~~~~~
 
 * Collection of methods
+* composed of a type/value. These are dynamic and at runtime point to the concrete type and the value
+* nil interface has both the type & value to nil. But beware, there can be cases where just the value
+  is nil. Such interfaces dont compare to nil.
+* interfaces are comparable (==) if the underlying type is comparable or if both are nil.
+  Otherwise, comparing uncomparable types causes runtime panic. (So this is not caught at compile time)
 
 composite literal
 ~~~~~~~~~~~~~~~~~
@@ -563,6 +572,15 @@ Not sure.. To read more on this
 v, ok = varName.(T)
 ----
 
+Comparability/compare/equality/==
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* basic types are comparable.
+* struct made of comparable basic types or structs are comparable.
+* interfaces are comparable if its current-type is comparable.
+* slices/maps/functions are NOT comparable.
+* array compares true if size is same and each of underlying value is
+  comparable and equal.
 
 Popular types/interfaces
 -------------------------
@@ -627,10 +645,15 @@ fmt.Println(i, c, python, java)
 
 fmt.Printf("Regular c style printing with formats:%d", i)
 ----
-+
-** %v is verb(name in go for format-specifier) to choose the default format for the
+
+Verbs
+^^^^^^
+
+Format specifier in go is called a verb. THe one between % and verb is an adverb
+
+* %v is verb(name in go for format-specifier) to choose the default format for the
    passed type
-*** %#v adverb will make it print in Go's syntax
+* %T is for type of the value
 ** %x for strings prints 2-hex-digits for each byte in string. An option space(adverb
    in go) adds a space between each byte.
 ** %x for []runes prints the runes in utf encoded hex values
@@ -652,6 +675,7 @@ bytes
 ~~~~~~
 
 * bytes.Buffer - efficient type for manipulation of []byte
+** bytes.Buffer.WriteByte()
 
 strconv
 ~~~~~~~~
@@ -696,6 +720,7 @@ time
 * Time - details unexported type for Time
 * Duration - nano-sec between 2 instances (upto 290 years)
 * time.Sleep(d Duration)
+* time.Afterfunc() - invoke a function after some time in its own go-routine!
 
 sync
 ~~~~
