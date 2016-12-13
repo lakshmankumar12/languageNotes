@@ -1,0 +1,21 @@
+== Basic data structures
+
+=== plain scalar var
+
+* Imagine everythign is string
+* tcl internally does integer/float arithmetic if contents are integer/float
+
+Assignment
+
+----
+set a "value"
+set b 10
+----
+
+== os commands
+
+----
+exec "ls file1 file2"
+----
+
+
