@@ -1,0 +1,6 @@
+
+* Functions always return sth
+
+* Arrays
+* Hashes
+

@@ -20,6 +20,7 @@ Commonish-stuff
 ~~~~~~~~~~~~~~~
 
 container.size()    /* gets len of vector deque, list, set, map */
+string.length()     /* string along has a length! Not sure of other container, but this is O(1) */
 
 Iterating through a container
 +++++++++++++++++++++++++
@@ -44,10 +45,30 @@ Reversing a container:
 /* reverses the container in place */
 reverse(v.begin(), v.end());
 
+Sort
+++++
+
+#include <algorithm>
+/* sorts the container in place */
+sort(v.begin(), v.end())
+sort(numbers.begin(), numbers.end(), std::greater<int>());
+
+bool myCustomFn(TypeOfObject &lhs, TypeOfObject &rhs);
+sort(numbers.begin(), numbers.end(), myCustomFn);
+
+Rotate
++++++++
+
+/* left rotate by n */
+rotate(v.begin(),v.begin()+n,v.end())
+
 strings
 --------
 
-s.append(
+str += "string to append";
+str.substr(begin_pos, count=<>);  /* if count is skipped, the size() is assumed)
+
+
 
 pair
 ~~~~
