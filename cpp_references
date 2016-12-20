@@ -1,0 +1,67 @@
+List of cpp stl containers
+----------------------------
+
+vector  ->   auto-growing array on one side.
+deque   ->   auto-growing array on both sides
+list    ->   linked list
+set     ->   ordered keys
+map     ->   ordered (key,value)s
+pair    ->   holder for a pair
+
+I/O streams
+-----------
+
+
+
+Detailed
+--------
+
+Commonish-stuff
+~~~~~~~~~~~~~~~
+
+container.size()    /* gets len of vector deque, list, set, map */
+
+Iterating through a container
++++++++++++++++++++++++++
+
+C++11
+for (auto it = begin (vector); it != end (vector); ++it) {
+      it->doSomething ();
+}
+for (auto & element : vector) {
+      element.doSomething ();
+}
+
+//If you need both index and value.
+for (int i = 0; i < v.size(); i++) {
+    // .. use v[i]
+    // .. You can also use v[i-1], v[i+1] with careful checks too.
+}
+
+Reversing a container:
+++++++++++++++++++++++
+
+/* reverses the container in place */
+reverse(v.begin(), v.end());
+
+strings
+--------
+
+s.append(
+
+pair
+~~~~
+
+p.first()    /* gets reference to first */
+p.second()      /* gets reference to second */
+
+vector
+~~~~~~
+
+v.push_back(value);  /* adds at end */
+
+Static define a vector
++++++++++++++++++++++
+
+const vector<int> primes({2, 3, 5, 7, 11});
+v
