@@ -65,9 +65,16 @@ rotate(v.begin(),v.begin()+n,v.end())
 strings
 --------
 
+str.length()
 str += "string to append";
 str.substr(begin_pos, count=<>);  /* if count is skipped, the size() is assumed)
 
+
+Math
+------
+
+#include <cstdlib>
+int abs(int);
 
 
 pair
