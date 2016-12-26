@@ -29,6 +29,7 @@ C++11
 for (auto it = begin (vector); it != end (vector); ++it) {
       it->doSomething ();
 }
+/* not sure where it works */
 for (auto & element : vector) {
       element.doSomething ();
 }

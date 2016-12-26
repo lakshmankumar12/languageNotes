@@ -5,15 +5,4 @@ obj = new ClassName();
 obj = new ClassName(arg1, arg2);
 
 
-Iterating through a vector
---------------------------
 
-C++11
-
-for (auto it = begin (vector); it != end (vector); ++it) {
-      it->doSomething ();
-}
-
-for (auto & element : vector) {
-      element.doSomething ();
-}
