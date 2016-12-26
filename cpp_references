@@ -20,7 +20,7 @@ Commonish-stuff
 ~~~~~~~~~~~~~~~
 
 container.size()    /* gets len of vector deque, list, set, map */
-string.length()     /* string along has a length! Not sure of other container, but this is O(1) */
+string.length()     /* string along has a length! Not sure of other container, but this is O(1). They are synonyms */
 
 Iterating through a container
 +++++++++++++++++++++++++
@@ -39,11 +39,24 @@ for (int i = 0; i < v.size(); i++) {
     // .. You can also use v[i-1], v[i+1] with careful checks too.
 }
 
+Max_elem
+++++++++
+
+max = *max_elem(v.begin(), v.end())
+
 Reversing a container:
 ++++++++++++++++++++++
 
 /* reverses the container in place */
 reverse(v.begin(), v.end());
+
+Removing from a vector as you iterate
+++++++++++++++++++++++++++++++++++++++
+
+//see if remove_if cuts for you
+bool unary_predicate(val_type);
+v.erase (remove_if(v.begin(), v.end(), unary_predicate),
+         v.end());
 
 Sort
 ++++
@@ -62,19 +75,33 @@ Rotate
 /* left rotate by n */
 rotate(v.begin(),v.begin()+n,v.end())
 
+Get typenames
++++++++++++++
+
+Container::value_type   /* gets value-type for vector, set, deque, list, set
+                           gets the pair-type for map */
+Container::iterator     /* iterator type */
+
 strings
 --------
 
 str.length()
 str += "string to append";
-str.substr(begin_pos, count=<>);  /* if count is skipped, the size() is assumed)
+str.substr(begin_pos, count=<>);  /* if count is skipped, the size() is assumed) */
 
+str[i]   /* gets char at position */
 
 Math
 ------
 
 #include <cstdlib>
 int abs(int);
+long abs(long);
+long long abs(long long);
+
+int max(int, int);
+
+int min(min, min);
 
 
 pair
@@ -83,13 +110,59 @@ pair
 p.first()    /* gets reference to first */
 p.second()      /* gets reference to second */
 
+make_pair(v1,v2)  /* create a pair from 2 variables */
+
 vector
 ~~~~~~
 
+vector<Type> v(100, initValue); /* intializes v with a size of 100 and each element to initValue(optional) */
+v.reserve(100);                 /* Grabs space for 100 w/0 having to reallocate */
+
 v.push_back(value);  /* adds at end */
+v.pop_back(value);   /* removes from end */
+
+/* int fun_taking_ref_to_type(Type &t) */
+for_each (v.begin(),v.end(), fun_taking_ref_to_type);
+
 
 Static define a vector
 +++++++++++++++++++++
 
 const vector<int> primes({2, 3, 5, 7, 11});
-v
+
+
+map
+~~~
+
+v = m[key]   /* to access the value at and to assign */
+             /* if key doesn't exist, a default value is created! */
+m[key] = v;
+
+
+//key exists in map
+m.find(key) == m.end()
+
+removed = m.erase(key)   /* returns 0/1 (erase-cnt) if key was deleted */
+m.erase(iterator);
+erase(begin, end);
+
+map's iterator is a iterator to a pair. it->first is the key, it->second is the value
+
+set
+~~~
+
+pair<it, bool> r = s.insert(val);
+0/1 = s.erase(val);
+
+s.find(val) == s.end()
+
+
+multimap
+~~~~~~~~~
+
+m.insert(pair<key,val>(v));
+
+m.count(key_val)  /* returns the number of values against this key */
+
+pair<Iter, Iter> range = mm.equal_range("Group1");
+int total = accumulate(range.first, range.second, 0);
