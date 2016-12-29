@@ -83,6 +83,31 @@ Container::value_type   /* gets value-type for vector, set, deque, list, set
                            gets the pair-type for map */
 Container::iterator     /* iterator type */
 
+Accumulate
++++++++++++
+
+std::vector<int> v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+int sum = std::accumulate(v.begin(), v.end(), 0);  /* (begin,end,init-value,operator-fn) */
+
+int product = std::accumulate(v.begin(), v.end(), 1, std::multiplies<int>());
+
+std::string s = std::accumulate(std::next(v.begin()), v.end(),
+                                    std::to_string(v[0]), // start with first element
+                                    [](std::string a, int b) {
+                                        return a + '-' + std::to_string(b);
+                                    });
+
+fill/populate/generate/assign
++++++++++++++++++++++++++++++
+
+std::vector<int> v(10);
+std::iota(v.begin(), v.end(), 0);
+
+std::vector<int> v2(10);
+int i = 0;
+std::generate(v2.begin(), v2.end(), [&i](){return i++; });
+
 strings
 --------
 
@@ -125,6 +150,13 @@ v.pop_back(value);   /* removes from end */
 /* int fun_taking_ref_to_type(Type &t) */
 for_each (v.begin(),v.end(), fun_taking_ref_to_type);
 
+/* initializing 2D vector */
+vector<vector<int> > 2dv(M, vector<int>(N,-1));
+
+
+/* clone/copy a vector - simple use copy constructor or assignment operator */
+vector<int> aCopy(orig);
+aCopy = anotherOrig;
 
 Static define a vector
 +++++++++++++++++++++
