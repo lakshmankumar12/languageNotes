@@ -1,12 +1,13 @@
 List of cpp stl containers
 ----------------------------
 
-vector  ->   auto-growing array on one side.
-deque   ->   auto-growing array on both sides
-list    ->   linked list
-set     ->   ordered keys
-map     ->   ordered (key,value)s
-pair    ->   holder for a pair
+vector       ->   auto-growing array on one side.
+deque        ->   auto-growing array on both sides
+list         ->   linked list
+set          ->   ordered keys
+map          ->   ordered (key,value)s
+pair         ->   holder for a pair
+forward_list -> singly linked list
 
 I/O streams
 -----------
@@ -108,6 +109,14 @@ std::vector<int> v2(10);
 int i = 0;
 std::generate(v2.begin(), v2.end(), [&i](){return i++; });
 
+Some common member functions
+++++++++++++++++++
+
+v.clear()        /* Clear the container */
+v.front()        /* get value of front element  -- undefined behavior on empty containers */
+v.back()         /* get value of last element -- undefined behavior on empty containers  */
+
+
 strings
 --------
 
@@ -168,7 +177,8 @@ map
 ~~~
 
 v = m[key]   /* to access the value at and to assign */
-             /* if key doesn't exist, a default value is created! */
+             /* if key doesn't exist, a default value is created!
+              *   Thus m[key]++ will auto-matically either add value or set to 1 resp if key already exist/not */
 m[key] = v;
 
 
@@ -199,3 +209,9 @@ m.count(key_val)  /* returns the number of values against this key */
 
 pair<Iter, Iter> range = mm.equal_range("Group1");
 int total = accumulate(range.first, range.second, 0);
+
+list
+~~~~~
+
+l.remove(val)   /* O(n) removes elements whose value matches */
+l.erase(iterator)  /* O(1) .. removes specified element */
