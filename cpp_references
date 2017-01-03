@@ -167,6 +167,9 @@ vector<vector<int> > 2dv(M, vector<int>(N,-1));
 vector<int> aCopy(orig);
 aCopy = anotherOrig;
 
+/* erase the 3rd element. Note the +(n-1) */
+vector.erase(begin()+2);
+
 Static define a vector
 +++++++++++++++++++++
 
