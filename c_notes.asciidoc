@@ -146,6 +146,8 @@ int main(int argc, char **argv)
 ----
 char *strcpy(char *dest, const char *src);
 char *strncpy(char *dest, const char *src, size_t n);
+void *memcpy(void *dest, const void *src, size_t n);
+void *memmove(void *dest, const void *src, size_t n);
 ----
 +
 ** strcpy/memcpy return the char*/void* of dst.
@@ -160,11 +162,30 @@ long long int strtoll(...);
 ** base is any of 0 to 36 (inclusive). 0 means 0x-begin, 0-begin or 10-base.
 ** end_ptr if non-NULL is set to the location of ptr which has first non-0 bad value. if it points to '\0', the entire string was good.
 ** errno is ERANGE if return is LONG_MAX/MIN and long doesn't fit.
+* memset
++
+----
+void *memset(void *s, int c, size_t n);
+----
+** memset returns the same s that is passed.
+
 
 == Compilation Tips
 
 * Argument -E in gcc stops at preprocessing stage
 * Argument -dM in processing stage dumps all macro definitions used.
+
+== Some other library functions
+
+* Double handling
++
+----
+double modf(double input, double *integral_op);
+----
++
+The above function splits the double into integral part and fractional part. The integral part is also returned as double, as a double can
+represent far more integer numbers than INT_MAX.
+
 
 ////
 Last read FAQ: 3.7
