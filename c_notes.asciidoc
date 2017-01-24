@@ -190,3 +190,9 @@ represent far more integer numbers than INT_MAX.
 ////
 Last read FAQ: 3.7
 ////
+
+== volatile
+
+* change done to a variable outside of compiler knowledge 
+   (by hardware, kernel, another thread)
+  So reload this value from memory on every access.

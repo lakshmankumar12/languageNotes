@@ -75,4 +75,147 @@ Difference between select/poll
 
 Good write up [here]https://daniel.haxx.se/docs/poll-vs-select.html
 
-Dev-poll splites the telling of which fd's and actual waiting into 2 sys-calls.
+Dev-poll splits the telling of which fd's and actual waiting into 2 sys-calls.
+
+Different between thread and semaphore
+-------------------------------------
+
+Good explanation at http://stackoverflow.com/questions/62814/difference-between-binary-semaphore-and-mutex/86021#86021
+
+* At the outset, mutext is for exclusive access, semaphore is for a limiting access to a certain count.
+----
+Mutex - Exclusive access.
+
+Lock
+Work
+UnLock
+
+Semaphore ( has an associated count against it).
+
+take()
+work();
+give()
+----
+* Other characteristic is that mutext is used for exclusion(locking), while semaphare is used for signalling.
+  The first task waits till something is ready, while the second task signals when that is available.
+* Mutex is typically same-task should release. (true to spirit of locking). 
+  Semaphore can be given by one task, while taken by another task (true to spirit of signalling).
+* A mutext is allowed to be re-entrant in some implementation(eg. recursive
+  mutex is posix), but sem's aren't (as they can be signalled by any task)
+
+If locking is what is required, use a mutext and not a semaphore with count 1. (Why? To Read)
+
+Other questions around here
++++++++++++++++++++++++++++
+
+1. Can a thread acquire more than one lock (Mutex)?
+    Yes
+2. Can a mutex be locked more than once?
+    Normal mutext- no. Recursive mutex-yes. Must be unlocked as many times.
+3. What happens if a non-recursive mutex is locked more than once.
+    Deadlock.
+4. Binary semaphore and mutex is same?
+    No.
+5. Mutext and critical section.
+   Synonyms, for purpose. BUt some OS crit-section means, disable interrupts and run. So cheap 
+   but may make CPU non-responsive!
+6. Can we acquire mutex/semaphore in an Interrupt Service Routine?
+   Not recommended. However, a ISR can typically signal a semaphore.
+7. Should a thready lock if a resource is unabailable?
+   Not necessary. That''s why posix has try_lock() which will return -ve immdly. The thread as
+   per design can go do other things.
+
+
+Difference between Process and Threads
+----------------------------------------
+
+Resources that are shared
+  - Stack / Execution unit / Registers
+  - Memory space
+  - Fds that are open
+    - regular files
+    - sockets
+    - Pipes
+
+When we say a thread, generally its just has only the stack that is private. Otherwise everything else is shared.
+Processes on the other hand, have everything for itself.
+ However, when a process forks, certain things are shared between parent & child.
+
+
+Context switch
+---------------
+
+In linux traditionally the ticks are tracked on time spent on user-space by a
+process, kernel-space by a process. Sometimes interrupts are processed in the context
+of a process in kernel-space. Typically the cpu of a process is the (user-time+kernel-time)/clock-time
+
+
+Dining Philosopher Issue
+-------------------------
+
+Problem:
+* Circular table, Every philosopher needs both side chopsticks. If every one acquire left side
+  and then try to take right side, it results in a dead lock.
+Solution
+* One idea is to release a left chopstick if right is not obtained. While this will solve the issue
+  most of the time, still theoretically, each philosopher may still take the left first, drop left,
+  take left again, drop left infinitely.
+* Another idea is to number chopsticks 0 to n-1 and have the philosophers pick the lower number first
+  and higher number next. Every philosopher will pick in one order except the last philosohper who
+  will pick in the other order, thus breaking the cycle.
+
+Deadloce-free class
+-------------------
+
+* Design a lock class that will lock, only if there is no dead-lock.
+Solution
+* Build a directed graph, where a edge A->B represents lock A is taken first and then lock B.
+* Keep buiding the graph, based on lock order. You have a possible deadlock, if a cycle gets
+  formed when adding a edge.
+  (We can use DFS to detect the cycle).
+
+Call-Order
+----------
+
+Assume a signgleton class. It has 3 methods. first(), second(), third(). How do u ensure,
+they are strictly called in order. first should finish, and then second should proceed etc..
+assumed 3 threads will independantly endup calling the functions.
+
+Hold 2 semaphores (cond_wait(). Signl them after first is complete, and second is complete()
+
+
+Synchronization Methods
+-----------------------
+
+We have a class with one serialized methond and one normal one. Can 2 threads execute the 2
+methonds concurrently
+Answer:
+Basically serialized is like holding a instance level lock and then executing the fucntion.
+So, while the call itself will happen, whether it will produce desired results depends on
+the design on the class and what elements are accessed.
+
+FizzBuzz
+--------
+
+You have 4 threads. One tread prints multiples of 3&5, one that of 3, one that of 5 and one
+the result. How will you make all 4 synchronize.
+Answer:
+The base variable that is incrementing should be same. Each thread has the condition as a
+local variable, and if its condition matches it preints that.
+
+Here is the snippet
+
+  lock.acquire();
+  if (my_condition_satisfies){
+    print("%d - %s",current,mystring);
+    current++;
+  }
+  lock.release();
+
+Note that one thread will lock. But it will silently do nothing, if its conditions diddn't match.
+The flipside is that there are too many spurious runs. To think of something more efficient.
+
+
+
+
+

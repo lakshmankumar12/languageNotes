@@ -206,6 +206,7 @@ Adding explicit to a constructor prevents implicit invocation to convert types
 * offer operator overloads like -> * to allow natural usage.
 * you may do a operator UnderlyingObject() to allow implicit conversion, but this may result in dangling references!
                           (but same issue results with .get(), just that its more explicit to see)
+
 ==== Item 16: Use new/delete and new[]/delete[]
 * esp be careful when the [] is hidden inside a typedef
 
