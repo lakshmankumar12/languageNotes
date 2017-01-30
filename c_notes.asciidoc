@@ -75,7 +75,7 @@ There are 4 major namespaces
 
 == Some facts to remember
 
-* size_t is unsigned.
+* size_t is unsigned. There is a ssize_t which is signed (used as ret-val for send())
 * struct compare isn't directly possible, as there are unused/padding holes in the struct.
 * ANSI C has a offsetof(type,field) macro in <stddef.h>
 * bit-fields are possible only within a struct/union definition

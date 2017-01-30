@@ -60,7 +60,8 @@ consumer:
 
 Pthread_mutex_lock(&nready.mutex);
 while (nready.nready == 0)                            /* while(ready-var) helps in preventing spurious wake up calls
-  Pthread_cond_wait(&nready.cond, &nready.mutex);     /* Note: wait releases the mutex. So always call wait within mutex. And wait will re-acquire mutex when it returns */
+  Pthread_cond_wait(&nready.cond, &nready.mutex);     /* Note: wait releases the mutex. So always call wait within mutex.
+                                                         And wait will re-acquire mutex when it returns */
 nready.nready--;
 Pthread_mutex_unlock(&nready.mutex);
 
@@ -70,6 +71,27 @@ read-write-locks
 pthread_rwlock_t
 
 
+Thread creation
+--------------
+
+pthread_t /* data-type to represent a thread's id */
+
+int pthread_create(pthread_t *thread,                             /* result arg - in which the child's id is placed */
+                   const pthread_attr_t *attr,
+                   void *(*start_routine) (void *), void *arg);
+
+pthread_t pthread_self(void);
+int pthread_equal(pthread_t lhs, pthread_t rhs);
+
+Termintate thread
+* fall off its start routine
+* pthread_exit
+        void pthread_exit(void *retval);        /* ret-val is passed to the thread that will call pthread_join */
+* pthread_cancel
+
+Keeping a threads detached is good, as exited thread resources are help up (like zombie processes) till someother
+thread called pthread_join()
+
 Difference between select/poll
 -------------------------------
 
@@ -77,12 +99,56 @@ Good write up [here]https://daniel.haxx.se/docs/poll-vs-select.html
 
 Dev-poll splits the telling of which fd's and actual waiting into 2 sys-calls.
 
+----
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+void FD_CLR(int fd, fd_set *set);
+int  FD_ISSET(int fd, fd_set *set);
+void FD_SET(int fd, fd_set *set);
+void FD_ZERO(fd_set *set);
+int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout, const sigset_t *sigmask);
+----
+* select uses timeval, while pselect uses timespec
+* select updates timeval to reflect how much time was left, while pselect doesn't change timeout.
+  This is linux behavior. POSIX per se allows leaving timeval or updating it.
+* if timeout is NULL, then select blocks. If both sec/usec is 0, then select returns immdly
+* select returns the total of all descriptors in read/write/error
+* pselect avoid the signalling race-cond by clubbing sigprocmask in one go.
+* FD_SETSIZE is the max size of fd_set
+
+----
+int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask);
+struct pollfd {
+    int   fd;         /* file descriptor */
+    short events;     /* requested events */
+    short revents;    /* returned events */
+};
+----
+* timeout is in milliseconds
+* events is one of POLLIN/POLLOUT/+ lots of POLLERR, POLLHUP
+
+epoll
+----
+int epoll_create(int size);
+int epoll_create1(int flags);
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+int epoll_pwait(int epfd, struct epoll_event *events, int maxevents, int timeout, const sigset_t *sigmask);
+----
+* Create a epoll instance. size is old and ignored. flags is for setting O_CLOEXEC
+* ctl sets up a fd, with one of the options and a usr-ata
+* wait gets the list of fd along with the events in it.
+* level triggered is default. Edge triggered is useful to detect change of status. This is useful,
+  if we dont want to read/write right-away, note down that its ready. Such fd's arent notified as
+  ready until we get a EGAGIN on a subsequent read/write.
+
+
 Different between thread and semaphore
 -------------------------------------
 
 Good explanation at http://stackoverflow.com/questions/62814/difference-between-binary-semaphore-and-mutex/86021#86021
 
-* At the outset, mutext is for exclusive access, semaphore is for a limiting access to a certain count.
+* At the outset, mutex is for exclusive access, semaphore is for a limiting access to a certain count.
 ----
 Mutex - Exclusive access.
 
@@ -96,14 +162,14 @@ take()
 work();
 give()
 ----
-* Other characteristic is that mutext is used for exclusion(locking), while semaphare is used for signalling.
+* Other characteristic is that mutex is used for exclusion(locking), while semaphare is used for signalling.
   The first task waits till something is ready, while the second task signals when that is available.
-* Mutex is typically same-task should release. (true to spirit of locking). 
+* Mutex is typically same-task should release. (true to spirit of locking).
   Semaphore can be given by one task, while taken by another task (true to spirit of signalling).
-* A mutext is allowed to be re-entrant in some implementation(eg. recursive
+* A mutex is allowed to be re-entrant in some implementation(eg. recursive
   mutex is posix), but sem's aren't (as they can be signalled by any task)
 
-If locking is what is required, use a mutext and not a semaphore with count 1. (Why? To Read)
+If locking is what is required, use a mutex and not a semaphore with count 1. (Why? To Read)
 
 Other questions around here
 +++++++++++++++++++++++++++
@@ -111,36 +177,69 @@ Other questions around here
 1. Can a thread acquire more than one lock (Mutex)?
     Yes
 2. Can a mutex be locked more than once?
-    Normal mutext- no. Recursive mutex-yes. Must be unlocked as many times.
+    Normal mutex- no. Recursive mutex-yes. Must be unlocked as many times.
 3. What happens if a non-recursive mutex is locked more than once.
     Deadlock.
 4. Binary semaphore and mutex is same?
     No.
 5. Mutext and critical section.
-   Synonyms, for purpose. BUt some OS crit-section means, disable interrupts and run. So cheap 
+   Synonyms, for purpose. BUt some OS crit-section means, disable interrupts and run. So cheap
    but may make CPU non-responsive!
 6. Can we acquire mutex/semaphore in an Interrupt Service Routine?
    Not recommended. However, a ISR can typically signal a semaphore.
-7. Should a thready lock if a resource is unabailable?
-   Not necessary. That''s why posix has try_lock() which will return -ve immdly. The thread as
+7. Should a thread block if a resource is unavailable?
+   Not necessary. That's why posix has try_lock() which will return -ve immdly. The thread as
    per design can go do other things.
 
+Different types of synchronization primitives
+--------------------------------------------
+
+atomic variables
+spin locks
+mutexes
+ * simple
+ * recursive
+ * read-write
+ * blocking/timed_wait
+semaphores
+
+--To read:
+* critical section
+* barrier
+
+c++ 14
+
+std::mutex
+std::timed_mutex
+std::recursive_mutex
+std::recursive_timed_mutex
+std::shared_timed_mutex
+
+std::lock_guard<>
+std::unique_lock<>
+std::shared_lock<>
 
 Difference between Process and Threads
 ----------------------------------------
 
 Resources that are shared
+ (man clone(2) gives a bunch of them)
   - Stack / Execution unit / Registers
   - Memory space
   - Fds that are open
     - regular files
     - sockets
     - Pipes
+    - memory mapped files
+  - Signals that are pending
+  - Signal handling disposition
+  - Locks (memory locks/file locks)
+  - Process stats
+  - Stuff like atexit behavior().
 
 When we say a thread, generally its just has only the stack that is private. Otherwise everything else is shared.
 Processes on the other hand, have everything for itself.
  However, when a process forks, certain things are shared between parent & child.
-
 
 Context switch
 ---------------
@@ -164,7 +263,7 @@ Solution
   and higher number next. Every philosopher will pick in one order except the last philosohper who
   will pick in the other order, thus breaking the cycle.
 
-Deadloce-free class
+Deadlock-free class
 -------------------
 
 * Design a lock class that will lock, only if there is no dead-lock.
@@ -177,7 +276,7 @@ Solution
 Call-Order
 ----------
 
-Assume a signgleton class. It has 3 methods. first(), second(), third(). How do u ensure,
+Assume a signleton class. It has 3 methods. first(), second(), third(). How do u ensure,
 they are strictly called in order. first should finish, and then second should proceed etc..
 assumed 3 threads will independantly endup calling the functions.
 
@@ -212,10 +311,81 @@ Here is the snippet
   }
   lock.release();
 
-Note that one thread will lock. But it will silently do nothing, if its conditions diddn't match.
-The flipside is that there are too many spurious runs. To think of something more efficient.
+Note that one thread will take the lock. But it will silently do nothing, if its conditions
+didn't match.  The flipside is that there are too many spurious runs. To think of something
+more efficient.
+
+Linux and threads
+-----------------
+
+* pthread defines the notion of a processid and a thread id.
+   process id is globally unique in system, while thread-id is local to the process.
+  Linux typically allows us to create a thread using clone() system call.
+   To emulate posix style process/thread -> linux does the thread grouping, and uses the
+     pid of the prcess as the thread id and hte thread-group's pid as the process pid.
+
+* Linux Threads was a first suppot for posix apis. This is superseded by NTPL from 2.6 onwards
+* NTPL (Native Threads for Posix in Linux) is the new implentattion that is implemented over
+  clone() and futex() system calls
 
 
+Fork in multi-threaded program
+------------------------------
 
+* fork() in a multi threaded program is mostly a disaster.
+  -> only calling thread is alive in the child.
+  -> only async functions can be called in child.
+    -> malloc, printf, syslog etc.. aren't async!
+  -> possible only useful reason to fork() is to exec(). Even then FD's should be closed at exec.
+     There may be race between parent's one thread's open()and fctnl() before which another thread
+     could have called fork.
+
+One useful function that tries to solve the problem with fork(2) in
+multi-threaded programs is pthread_atfork(). It has the following prototype:
+
+
+int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
+It allows to set handler functions that will be automatically executed on fork call:
+prepare - Called just before a new process is created.
+parent - Called after a new process is created in the parent.
+child - Called after a new process is created in the child.
+
+The purpose of this call is to deal with critical sections of a multi-threaded
+program at the time fork(2) is called. A typical scenario is when in the
+prepare handler mutexes are locked, in the parent handler unlocked and in the
+child handler reinitialized.
+
+
+Signals
+------
+
+* In a process with many threads
+
+
+Time
+----
+
+time_t -> seconds
+timeval -> micro sec
+timespec -> nanonsec
+
+rtdsc -> a monotic counter from cpu
+  -> but not necessarily accurate. It may drift based on cpu's turbo speeding.
+
+Read/Write
+-----------
+
+sendmmsg() is a api to send multiple messages in one go.
+
+----
+int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, unsigned int flags);
+
+/*msg_hdr itself is as per sendmsg */
+struct mmsghdr {
+    struct msghdr msg_hdr;  /* Message header */
+    unsigned int  msg_len;  /* Number of bytes transmitted */
+};
+----
 
 

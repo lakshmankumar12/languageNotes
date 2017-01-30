@@ -1,0 +1,13 @@
+What is redis
+--------------
+
+* In memory database.
+* Key-value store
+
+Database
+---------
+
+The biggest level of compartmentalization
+
+#default database is 0.
+select 0

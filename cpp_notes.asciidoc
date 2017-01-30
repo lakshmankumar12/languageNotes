@@ -109,7 +109,6 @@ const Object operator++(int) // postfix
 
 Object& operator--()         // prefix
 const Object operator--(int) // postfix
-Object& operator++()         // prefix
 ----
 
 == Miscellaneous notes

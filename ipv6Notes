@@ -129,3 +129,33 @@ Special features in IPv6
 -------------------------
 
 * Anycast -> The ability to choose any random destination in a group.
+
+
+Extenstion Headers in Ipv6-Header
+---------------------------------
+
+* Hop by Hop
+** To be read by every next hop
+* Destination Options (before routing)
+* Routing
+* Fragment
+* Auth Header AH
+* ESP
+* Destination options (before upper-layer)
+* Upper-layer header
+
+Fragmentation in IPv6
+---------------------
+
+* Every router should support minimum MTS of 1280.
+* Only originating host does fragmentation, if at all. No router will do it.
+* If a router gets a big pkt and can't forward it, it sends a ICMPv6 "Packet too big", just
+  as if DONT-FRAGMENT bit was sent in ipv4.
+* Orig host then will have to chunk up. All fragments have the constant first part
+  and the varying second part.
+* The fragment header's M-bit (more) tells if more fragments follow or it its last. It
+  also contains this fragment's first-octet's offset in the original pkt.
+* The recipient upon receiving any of the fragment starts a 60s timer to wait for rest of
+  fragments to arrive. If they dont, it discards. If the first pkt was received, it sends
+  a ICMP-TimeExceeded.
+
