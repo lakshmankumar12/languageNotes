@@ -143,7 +143,7 @@ int epoll_pwait(int epfd, struct epoll_event *events, int maxevents, int timeout
   ready until we get a EGAGIN on a subsequent read/write.
 
 
-Different between thread and semaphore
+Different between mutex and semaphore
 -------------------------------------
 
 Good explanation at http://stackoverflow.com/questions/62814/difference-between-binary-semaphore-and-mutex/86021#86021
@@ -370,8 +370,16 @@ time_t -> seconds
 timeval -> micro sec
 timespec -> nanonsec
 
-rtdsc -> a monotic counter from cpu
+rdtsc -> a monotic counter from cpu
   -> but not necessarily accurate. It may drift based on cpu's turbo speeding.
+
+clock_gettime
+
+
+memory barrier/compiler memory barrier
+
+rdtsc
+rdtscp
 
 Read/Write
 -----------
