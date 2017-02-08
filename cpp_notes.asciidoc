@@ -109,6 +109,10 @@ const Object operator++(int) // postfix
 
 Object& operator--()         // prefix
 const Object operator--(int) // postfix
+
+non-member:
+friend Object& operator++( Object& )      // Prefix increment
+friend Object& operator++( Object&, int ) // Postfix increment
 ----
 
 == Miscellaneous notes
