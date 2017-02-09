@@ -132,6 +132,19 @@ str.substr(begin_pos, count=<>);  /* if count is skipped, the size() is assumed)
 
 str[i]   /* gets char at position */
 
+constructing:
+string();                                                  // default. empty string
+string (const string& str);                                // copy construct.
+string (const string& str, size_t pos, size_t len = npos); // create a substring from another str
+string (const char* s);                                    // create from c-string
+string (const char* s, size_t n);                          // create from c-string restricted to size
+string (size_t n, char c);                                 // create prefilled of size
+template <class InputIterator>                             // create from another range
+string  (InputIterator first, InputIterator last);
+
+/* assign can be used to create a string with new values */
+string &assign (....);  // all construct options
+
 Math
 ------
 

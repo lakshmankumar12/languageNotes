@@ -280,7 +280,8 @@ Adding explicit to a constructor prevents implicit invocation to convert types
 * reinterpret_cast<T>(expr)
 ** cast ptr to int etc.. May not be portable
 * static_const<T>(expr)
-** force implicit converstions. Non-const to const, void* to ptr*, ptr-base to ptr-derived (without check)
+** Safe cast (Probably one cast that is like okay. The above 3 are largely bad).
+** force implicit converstions. Non-const to const, void* to ptr*, int-to-double, ptr-base to ptr-derived (without check)
 * Try hiding casts inside functions so that client code is free
   of them.
 
