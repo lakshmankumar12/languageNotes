@@ -135,10 +135,16 @@ v.back()         /* get value of last element -- undefined behavior on empty con
 char stuff
 -----------
 
-tolower Convert uppercase letter to lowercase (function )
-islower Check if character is lowercase letter (function )
-isupper Check if character is uppercase letter (function )
-isalpha
+tolower  // Convert uppercase letter to lowercase (function )
+toupper
+
+character classification routines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+isalnum, isalpha, isascii, isblank,
+iscntrl, isdigit, isgraph, islower,
+isprint, ispunct, isspace, isupper,
+isxdigit
 
 
 strings
@@ -162,6 +168,26 @@ string  (InputIterator first, InputIterator last);
 
 /* assign can be used to create a string with new values */
 string &assign (....);  // all construct options
+
+npos
+~~~~
+
+static const to let know the max possible value. (used in string function to signal end of string)
+
+
+trim a string
+~~~~~~~~~~~~
+
+string trim(const string& str)
+{
+    size_t first = str.find_first_not_of(' ');
+    if (string::npos == first)
+    {
+        return str;
+    }
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
 
 Math
 ------
