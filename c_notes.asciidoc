@@ -133,6 +133,8 @@ printf("%d %d", f1(), f2());   /* no guarantee on order of f1 or f2 */
 
 Talked about in http://c-faq.com/expr/unswarn.html[faq 3.19]
 
+Also note that signed int overflow is UNDEFINED. Unsigned overflow follows modulo-arithmentic.
+
 == Signatures of common routines
 
 * main

@@ -300,3 +300,4 @@ list
 
 l.remove(val)   /* O(n) removes elements whose value matches */
 l.erase(iterator)  /* O(1) .. removes specified element */
+l.insert(iterator, value) /* inserts at iterator, whetever is prevly pointed by interator comes after current insertion */
