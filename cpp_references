@@ -12,7 +12,30 @@ forward_list -> singly linked list
 I/O streams
 -----------
 
+// Reading from file.
 
+#include <fstream>
+std::ifstream infile("thefile.txt");
+
+int a, b;
+while (infile >> a >> b)
+{
+      // process pair (a,b)
+}
+
+// Line based reading
+#include <sstream>
+#include <string>
+
+std::string line;
+while (std::getline(infile, line))
+{
+    std::istringstream iss(line);
+    int a, b;
+    if (!(iss >> a >> b)) { break; } // error
+
+    // process pair (a,b)
+}
 
 Detailed
 --------
@@ -118,7 +141,7 @@ fill/populate/generate/assign
 +++++++++++++++++++++++++++++
 
 std::vector<int> v(10);
-std::iota(v.begin(), v.end(), 0);
+std::iota(v.begin(), v.end(), 0);  // add value++ to every element.
 
 std::vector<int> v2(10);
 int i = 0;
@@ -177,6 +200,8 @@ static const to let know the max possible value. (used in string function to sig
 
 trim a string
 ~~~~~~~~~~~~
+
+s.erase(s.find_last_not_of(" \n\r\t")+1);
 
 string trim(const string& str)
 {
