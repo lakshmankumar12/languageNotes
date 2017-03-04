@@ -12,7 +12,22 @@ forward_list -> singly linked list
 I/O streams
 -----------
 
-// Reading from file.
+// opening a file
+int main () {
+  ifstream file;
+  file.exceptions ( ifstream::failbit | ifstream::badbit );
+  try {
+    file.open ("test.txt");
+    while (!file.eof()) file.get();
+  }
+  catch (const ifstream::failure& e) {
+    cout << "Exception opening/reading file";
+  }
+
+  file.close();
+
+  return 0;
+}
 
 #include <fstream>
 std::ifstream infile("thefile.txt");
