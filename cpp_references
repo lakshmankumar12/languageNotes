@@ -12,7 +12,9 @@ forward_list -> singly linked list
 I/O streams
 -----------
 
-// opening a file
+Open a file handling errors:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 int main () {
   ifstream file;
   file.exceptions ( ifstream::failbit | ifstream::badbit );
@@ -29,16 +31,9 @@ int main () {
   return 0;
 }
 
-#include <fstream>
-std::ifstream infile("thefile.txt");
+Line based reading
+~~~~~~~~~~~~~~~~~
 
-int a, b;
-while (infile >> a >> b)
-{
-      // process pair (a,b)
-}
-
-// Line based reading
 #include <sstream>
 #include <string>
 
@@ -51,6 +46,13 @@ while (std::getline(infile, line))
 
     // process pair (a,b)
 }
+
+Printing format control
+~~~~~~~~~~~~~~~~~~~~~~~
+
+oldwidth=cout.width(newWidth);
+/* or */
+cout<<std::setw(newWidth)<<i;
 
 Detailed
 --------
