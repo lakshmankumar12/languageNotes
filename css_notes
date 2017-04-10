@@ -5,6 +5,11 @@ plain -> any defined html element
 .className
 #idname
 
+* class override in last-written gets weight.
+* Precedence
+   plain-outer <  plain-inner  < class-name-first-defined < class-name-last defined < id < inline
+* !important in class names overrides everthing else.
+
 properties
 ----------
 
@@ -18,3 +23,49 @@ display: None
 
   Hides the element.
 
+
+margin : Outline
+padding : distance from margin
+
+
+Bootstrap:
+----------
+#add-this:
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+
+* To get started, we should nest all of our HTML in a div element with the class container-fluid.
+
+For images:
+~~~~~~~~~~~
+* Add class "img-responsive" to auto-adjust images!
+
+For text:
+~~~~~~~~
+* class "text-center" to center-align
+* class "text-primary"
+* class "text-danger"
+
+For buttons:
+~~~~~~~~~~~~
+* Add class "btn" to button. Button is only as big as text. Always required for buttons
+* Add class "btn-block" to make button strech to entire hori-width
+* "btn-primary" is the main color for a btton. Use this for your main button
+* "btn-info" for info buttons, "btn-danger" for delete'ish buttons
+
+Bootstrap has a responsive grid system (of size 12).
+
+These classes should be in div elements of their own.
+
+.row class specifies one-row
+
+Medium
+.col-md-1 (12-such-blocks)
+.col-md-2 (6 -such-blocks)
+.col-md-4 (3 -such-blocks)
+.col-md-6 (2 -such-blocks)
+.col-md-8 (1 -such-block, can be stacked with another say 4)
+
+xtra-small
+.col-xs-1
+
+<span>...</span> is used to create a division in text.
