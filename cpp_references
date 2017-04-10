@@ -157,6 +157,7 @@ lower_bound(v.begin(), v.end(), a);
 fill/populate/generate/assign
 +++++++++++++++++++++++++++++
 
+#include<numeric>
 std::vector<int> v(10);
 std::iota(v.begin(), v.end(), 0);  // add value++ to every element.
 
@@ -305,6 +306,14 @@ erase(begin, end);
 
 map's iterator is a iterator to a pair. it->first is the key, it->second is the value
 
+unordered_map
+~~~~~~~~~~~~~
+
+unordered_map<key_type,value_type,hash_functor,equality_functor>
+
+#include<functional>
+std::hash<int>()  // int functor.
+
 set
 ~~~
 
@@ -343,3 +352,25 @@ list
 l.remove(val)   /* O(n) removes elements whose value matches */
 l.erase(iterator)  /* O(1) .. removes specified element */
 l.insert(iterator, value) /* inserts at iterator, whetever is prevly pointed by interator comes after current insertion */
+
+bitset
+~~~~~~
+
+* biggest bummer is the size of bit set is compile time defined
+* bitset doesn't have iterators.
+
+bitset<SIZE>  bs;
+
+
+permutation
+~~~~~~~~~~~
+
+#include<algorithm>
+
+// Rearranges v into the next lexicographical permutation. Returns 0 if its already greater
+bool next_permutation(v.begin(),v.end())
+
+There is no inherent next_combination, but we can use a bool-set to get next_combination
+See: http://stackoverflow.com/a/9430993/2587153
+
+
