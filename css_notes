@@ -37,11 +37,11 @@ Bootstrap:
 
 For images:
 ~~~~~~~~~~~
-* Add class "img-responsive" to auto-adjust images!
+* Add class "img-responsive" to auto-adjust images! This goes into img tag.
 
 For text:
 ~~~~~~~~
-* class "text-center" to center-align
+* class "text-center" to center-align. These directly go to the h*,p elements
 * class "text-primary"
 * class "text-danger"
 
@@ -51,6 +51,7 @@ For buttons:
 * Add class "btn-block" to make button strech to entire hori-width
 * "btn-primary" is the main color for a btton. Use this for your main button
 * "btn-info" for info buttons, "btn-danger" for delete'ish buttons
+* "btn-default"
 
 Bootstrap has a responsive grid system (of size 12).
 
@@ -69,3 +70,26 @@ xtra-small
 .col-xs-1
 
 <span>...</span> is used to create a division in text.
+
+jumbotron - grey box
+
+
+Font-awesom
+~~~~~~~~~~~~
+
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+
+* <i class="fa"></i>
+* fa-thumbs-up
+* fa-info-circle
+* fa-trash
+* fa-paper-plane
+
+Animate.css
+~~~~~~~~~~~
+
+* class="animated" precedes
+* "bounce"
+* "shake"
+* "fadeOut"
+* "hinge"

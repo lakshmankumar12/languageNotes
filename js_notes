@@ -192,7 +192,30 @@ if/while/for -> conditions inside parenthesis
 Jquery
 ------
 
-$("#id_name").append(htmlContent);
+Objects:
+
+$(document)      <-- Entire doc
+$("button")      <-- All elemetns of that type
+$(".class-name") <-- All elements of this class
+$("#id")         <-- Exact Element with this id
+
+Functions:
+
+$("#elementSelector").addClas("animated-bounce");
+$("#elementSelector").css("property","value");
+$("#elementSelector").prop("property",value);
+
+$("#elementSelector").html(htmlContent);   // Replaces html content
+$("#elementSelector").text(textContent);   // Replaces html content w/o tags
+$("#elementSelector").remove();            // Removes an entire element
+$("#elementSelector").appendTo("#targetElement"); // Moves this to target
+$("#elementSelector").clone();             // Clones and returns the new element, so that u can chain the netxt function
+.parent()
+.children()
+$("...:nth-child(1-based-index)")
+$("...:odd")
+
+$("#elementSelector").append(htmlContent);
 
 Global object
 -------------
