@@ -15,7 +15,10 @@ set b 10
 == os commands
 
 ----
-exec "ls file1 file2"
+set a [ exec "ls file1 file2" ]
 ----
+
+#regexp
+regexp ?switches? re_exp string ?matchVar? ?subMatchVar subMatchVar ...?
 
 
