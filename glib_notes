@@ -1,0 +1,85 @@
+Glib Notes
+==========
+
+https://www.gnu.org/software/guile-gnome/docs/glib/html/IO-Channels.html#IO-Channels
+
+GIOChannel *gioch;
+  The <gio-channel> data type aims to provide a portable method for using file
+  descriptors, pipes, and sockets, and integrating them into the main event loop.
+  Currently full support is available on UNIX platforms, support for Windows is
+  only partially complete.
+
+  g-io-channel-unix-new()  # create any of regular-file, pipe, socket
+  g-io-channel-new-file()  # create a regular-file
+
+  * <gio-channel> instances are created with an initial reference count of 1.
+  * g-io-channel-ref and g-io-channel-unref can be used to increment or decrement the reference count respectively.
+  * When the reference count falls to 0, the <gio-channel> is freed.
+     (Though it isn't closed automatically, unless it was created using g-io-channel-new-from-file.)
+  * Using g-io-add-watch or g-io-add-watch-full increments a channel's reference count.
+
+
+g-io-channel-read-chars()
+g-io-channel-write-chars()
+g-io-channel-seek-position()
+g-io-channel-shutdown()
+  Do something on a channel
+
+
+g-io-add-watch()
+g-io-add-watch-full()
+  add a channel to main loop
+
+New functions:
+g-io-channel-read-chars()
+g-io-channel-read-line()
+g-io-channel-read-line-string()
+g-io-channel-read-to-end()
+g-io-channel-write-chars()
+g-io-channel-seek-position()
+g-io-channel-flush()
+
+Old/Deprecated
+g-io-channel-read()
+g-io-channel-write()
+g-io-channel-seek()
+
+  - Dont mix new/old functions on same channel
+
+Main-loop
+---------
+
+https://tecnocode.co.uk/2014/03/27/what-is-gmaincontext/
+
+* To allow multiple independent sets of sources to be handled in different threads, each
+  source is associated with a <g-main-context>.
+* A <g-main-context> can only be running in a single thread, but sources can be added to
+  it and removed from it from other threads.
+
+
+* Main contexts do the bulk of the work: preparing source lists, waiting for events,
+  and dispatching callbacks. A main loop just iterates a context.
+
+my-take
+~~~~~~~
+main-context and main-loop have one-to-one relation. THey could have as well made the
+2 objects the same. The main-loop is use for iteration-calls etc.. while main-context
+is used to add-events etc..
+
+enum GIOCondition
+------------------
+G_IO_IN
+G_IO_OUT
+G_IO_PRI
+G_IO_ERR
+G_IO_HUP
+G_IO_NVAL
+
+Other functions
+---------------
+
+g_io_add_watch
+  - s the GIOChannel into the default main loop context with the default priority.
+    (returns a event-id(int) not sure, what that is though)
+    Essentially makes the channale as a source and adds to main context.
+
