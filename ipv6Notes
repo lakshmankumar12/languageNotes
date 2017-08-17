@@ -1,5 +1,52 @@
+Address Size
+------------
+
+ipv4 - 4 octets
+ipv6 - 16 octets (4 times size of ipv4 - mnemonic, A-record vs AAAA-record)
+       Represented as 8*2-octet hex digits
+       Represented as 8*4       hex nibbles
+       Unofficial - one 2 byte/4-hex-nibbles is called a hextet. Thus there are 8 hextets
+
+       128 -bits in size
+
+Notation Recos:
+~~~~~~~~~~~~~~~
+
+* small-case recommended, upper-case is okay though
+* Omit leading 0's in a hextet
+* You can elimiate one run of all-0 hextets with ::
+* Use a 3-1-4 rule to combine hextets
+* Prefix is always address/prefix
+
+Address parts
+~~~~~~~~~~~~~
+
+global-routing-prefix
+subnet-id
+interface-id
+
+global-routing-prefix + subnet-id  = subnet-prefix
+
+both subnet-id/interface-id part can have all-0's and all-1's
+
+Address type
+--------------
+
+IPV6
+ * Unicast
+   * Global Unicast
+   * Link Local    FE80::/10
+   * Loopback      ::1/128
+   * Unspecified   ::0/128  (all-zeros)
+   * Unique Local
+   * Embedded ipv4
+ * Multicast
+   * Assigned
+   * Solicated Node
+
 IP-Prefixes
 ------------
+
 
 Binary       |   Hex          |   What                 |  Notes
 -------------+----------------+------------------------+----------
@@ -12,6 +59,10 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |           a AS               From MAC .. insert FFEE into ur 48bit mac (in the MIDDLE 2 octets!)
              |                |                        |
              |                |                        |
+             |                |                        | Provider Independant(PI): Directly given by RIR to individual entities. Agnostic to Provider
+             |                |                        | Provider Aggregatable(PA): RIR to ISP. ISP to customer
+             |                |                        |
+             |                |                        |
 11111110     |  FE80::        |   Link Local           |  Always assignable locally. As of now,
 10000000     |                |                        |
              |                |                        |          +----+----+----+----+----+----+----+----+
@@ -22,8 +73,8 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |  This address can't escape a L2 network. Routers shouldn't pass them over. So, within a L2
              |                |                        |    you can communicate w/o bothering to get any other IPv6
              |                |                        |
-1111110x     |  FDxx::        |  Unique Local          |  The FCxx:: is like undefined for now. Its always FDxx::
-             |  FCxx::        |  (is this site-local?) |
+1111110x     |  FDxx::/7      |  Unique Local          |  The FCxx:: is like undefined for now. Its always FDxx::
+             |  FCxx::/7      |                        |
              |                |                        |          +----+----+----+----+----+----+----+----+
              |                |                        |          |FD...yyyy.....|    |    64  bits       |
              |                |                        |          +----+----+----+----+----+----+----+----+
@@ -33,6 +84,11 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |
              |                |                        |  This is like a organization's local boundary. This pkt will not be routed in internet.
              |                |                        |  (Kind of private address space)
+             |                |                        |  However this is still expected to be globally unique (generated using time-stamp/eui etc..)
+             |                |                        |   so that when 2 sites using ULA are combined, there aren't conflicts.
+             |                |                        |
+             |  FEC0::/10     |  Site-Local            |   Deprecated.
+             |                |                        |
              |                |                        |
              |                |                        |
 all 0's      |  ::/128        |  Unspecified           |  Nobody should use this for any purpose!
@@ -43,6 +99,17 @@ No bits      |  ::/0          |  Default route         |  Any address matches to
              |                |                        |
 127 0's and  |  ::1/128       |  Loopback              |  Exactly one loop address in contrast to a entire 127.*.*.* in ipv4
 single 1     |                |                        |
+             |                |                        |
+             |  ::/80         | IPv4-Compatible-IPv6   |  Deprecated.
+             |                |                        |  Just use 00...00 and put ipv4 in the last 32 bits.
+             |                |                        |     Five hextets of all-0's and then ipv4 address
+             |                |                        |     0:0:0:0:0:0:<ipv4-in-2-hextets>
+             |                |                        |
+             |                |                        |
+             |  ::/??         | IPv4-mapped-ipv6       |  Again, put ipv4 in last 32, use FFFF for next 16 bits.
+             |                |                        |     0:0:0:0:0:FFFF:<ipv4-in-2-hextets>
+             |                |                        |
+             |                |                        |
              |                |                        |
 11111111     |  FFxy::        |  Multicast             |  Multicast IP
              |                |                        |          +----+----+----+----+----+----+----+----+
@@ -71,6 +138,50 @@ Other reserved multicast addresses
  FF02::6            OSFFv3 designated routers
  FF02::9            RIPng
  FF02::A            EIGRP
+
+Soliced node Multicast
+~~~~~~~~~~~~~~~~~~~~~~
+
+FF02:0:0:0:0:1:FF00::/104  (104 ends with that FF, u have 24 left (1.5 hextets))
+   - Every node listens to this solicted multi-cast matching its unicast addresses. Thus it answers to
+     unicast'ish messages that match last 24 bits of the solicted address.
+     (Q, whoever is sending, can direclty send to the unicast right? When is this multicast useful at all?)
+
+
+Anycast
+~~~~~~~~
+
+* Synctactically indistinguishable from Unicast
+* Device that has the Anycast, knows that its a anycast IP
+
+
+Assigning Addresses
+--------------------
+
+Global Unicast
+  * Manual
+    * ipv6 address
+      * static
+      * eui-64
+    * ipv6 unnumbered
+  * dynamic
+    * stateless autoconfig
+      * eui-64
+      * random
+    * dhcpv6
+Link Local
+  * eui-64
+  * random
+  * static (enter manually)
+
+
+EUI-64
+~~~~~~
+
+* Take 6 octets of the MAC. SPlit into 3+3. First 3 is the OUI (Organization Uniqe Id)+ next 3 is device id.
+* Insert a FFEE in between. This makes it 8 octets.
+* Flip the 7th bit frm MSB from 0->1. 0 means globally unique as per mac-stds. 1 is locally administered.
+   But the IPv6 specs say flip, instead of saying make it 1. So, there is some confusion here.
 
 ARP is replaced with ICMPv6 neighbour discovery protocol
 --------------------------------------------------------
@@ -117,6 +228,16 @@ Redirect:                This may be the situation where a Router recei
                          Next­hop is where the host will send its data destined to a host 
                          which does not belong to the same segment.
 
+Address Lifetimes
+-----------------
+
+Tentative  |     Valid                | Invalid
+           | Preferred  | Deprecated  |
+
+--Preferred Lifetime--->
+-------Valid Lifetime---------------->
+
+
 Sub-netting
 -----------
 
@@ -129,6 +250,38 @@ Special features in IPv6
 -------------------------
 
 * Anycast -> The ability to choose any random destination in a group.
+
+
+Header in ipv6
+---------------
+
+  +-------+-------+-------+-------+
+  |Version| Traffic Class |       | 02 octets
+  +-------+-------+-------+-------+
+  |   Flow Label (20 bits)        | 04 octets
+  +-------+-------+-------+-------+
+  |   Payload Len (16 bits)       | 06 octets
+  +-------+-------+-------+-------+
+  |Nxt Hder       | Hop Limit     | 08 octets
+  +-------+-------+-------+-------+
+  |     Src Add   |     ..        |
+  |     ..        |     ..        |
+  |     ..        |     ..        | 24 octets
+  +-------+-------+-------+-------+
+  |     Dst Add   |     ..        |
+  |     ..        |     ..        |
+  |     ..        |     ..        | 40 octets
+  +-------+-------+-------+-------+
+
+* version -  always 6
+* TC      -  either DSCP(6-bits)+Flow+Ctrl bits   (mostly common)
+             or the older std-IPv4, precendence(3 bits)
+             Essentially same as the IPv4's ToS (type of service)
+* Flow label - Somewhat experimental. Routers can use this to identify flwos between (src,dst) Pairs
+* Len        - Len in octets post the 40-byte. (Including externsion hdrs and actual data)
+               Note: While 64K is the ipv6 size, with the jumbogram extension header upto 4G pkt size is possible.
+* nxt-hdr    - ipv6 chains option headers using this strategy
+* hop
 
 
 Extenstion Headers in Ipv6-Header
@@ -159,3 +312,111 @@ Fragmentation in IPv6
   fragments to arrive. If they dont, it discards. If the first pkt was received, it sends
   a ICMP-TimeExceeded.
 
+ICMPv6
+-------
+
+* Destination Unreachable
+* Packet Too Big
+* Time Exceeded
+* Parameter problem
+* Echo Request
+* Echo Reply
+* Router Solicitation
+  * src ip is either the sender's ip or ::0/128(unspec)
+  * tgt ip is FF02::2 (all-routers multicast)
+  * icmp has src-link layer address
+* Router Advertisement
+  * src ip is router's link-local address
+  * dst ip is typically FF02:1 (all-nodes multicast)
+  * icmp has a M-flag (managed), this tells if DHCP or SLAAC
+  * router-lifetime
+    * lifetime of 0 indicates router is not a default gw
+  * recheable time (useful for NUD)
+  * retrans time (again for NUD)
+  * prefix info
+  * MTU
+* Neighbour Solicitation
+  * src ip is either the sender's ip or ::0/128(unspec) if DAD
+  * tgt ip is solicated multicast for the tgt ip or the tgt ip itself.
+  * has
+    * the ipv6 addr target, for which mac-address is desired
+    * source link layer address (question - isn't this in the L2 header?)
+* Neighbour Advertisement
+  * src ip is sending interface ip
+  * dst ip is eitehr FF02::1 (all-node multicast) if soliciation has ::0/128, otherwise sender ip
+  * R-bit (router/not)
+  * S-bit (answer to a solictionation/not)
+  * O-bit (override existing info)
+  * tgt-address (copied from solictiation/link-address that has changed)
+  * src-link-layer-address
+* Redirect
+
+Neighbour Discovery
+-------------------
+(repeat notes, just gathering in one place)
+
+* used for stateless address autoconfig (SLAAC).
+* Duplicate address Detection (DAD)
+* ARP-ish equivalent (find link addr of a Ip)
+* Track with neighbours are reacheable (NUD)
+* when router fails, search for alternate routers.
+
+Host maintain
+* Neighbour cache (simliar to arp-table)
+* Destination cache (ip->mac for every ip (including ip's of different subnets))
+
+Neighbour Discovery states
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  No entry exists -----------------------------------> Incomplete
+                  <----------------------------------     |
+                                                          |
+          +----------------  Recheable <------------------+
+          |                    ^       <-------------+
+          |                    |                     |
+          v                    |                     |
+   Stale(No action Reqd) --> Delay -------------->  Probe --...-> (No entry)
+
+No entry exists: Placeholder state to note nothing w.r.t this IP
+
+Incomplete:      A NS has been sent. If no response after 3 tries, go back to
+                 no entry exists
+
+Recheable:       After a NA is received.
+
+Stale:           Either a timeout or a unsolicated NA(!) has happened.
+                 At this point, nothing is required by the host.
+
+Delay:           An upper layer protocol packet needs to be sent.
+                 This is just sent out. If a reply to that arrives,
+                 we normally move to Recheable. Otherwise, we go to probe
+
+Probe:           Explicit NS again. If okay, then recheable, otherwise No-entry.
+
+
+Neighbour Unrecheability
+------------------------
+
+* Done only aganist directly connected hosts.
+
+
+Security Threats
+-----------------
+
+* Neighbour Discovery Exhaustion
+   - The no of peers in same subnet is more way more. So  your arp-cache (neighbour-cache in ipv6) can become big.
+
+
+Reading book - ipv6 fundamentals - cisco press
+===============================================
+
+* ch-1, blah-blah history, ipv4 exhaustion.
+* ch-2, ipv4 header, ipv6 header
+* ch-3, hex notation, address-types
+* ch-4, Detailed Address-Type
+* ch-5, icmp-v6 and neighbour discovery
+             Done.
+* ch-6, ipv6 configuration
+             Skimmed (not really useful)
+
+* ch-7, routing in ipv6

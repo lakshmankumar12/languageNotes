@@ -31,7 +31,9 @@ padding : distance from margin
 Bootstrap:
 ----------
 #add-this:
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
 
 * To get started, we should nest all of our HTML in a div element with the class container-fluid.
 
@@ -52,6 +54,16 @@ For buttons:
 * "btn-primary" is the main color for a btton. Use this for your main button
 * "btn-info" for info buttons, "btn-danger" for delete'ish buttons
 * "btn-default"
+    **  btn-default
+    **  btn-primary
+    **  btn-success
+    **  btn-warning
+    **  btn-info
+    **  btn-danger
+
+    **  btn-block
+    **  btn-large
+
 
 Bootstrap has a responsive grid system (of size 12).
 
@@ -73,6 +85,43 @@ xtra-small
 
 jumbotron - grey box
 
+panel  ->  A panel in bootstrap is a bordered box with some padding around its content
+  .panel-default
+  .panel-heading
+  .panel-body
+well
+
+navbar
+  navbar-inverse
+  navbar-brand
+
+page-header
+input-group
+form-control
+input-group-btn
+table
+table-striped
+label
+label-default
+
+Grid layout
+------------
+
+<div id="gridContainer">
+    <div class="row grid-row">
+        <div class="col-xs-1">1</div>
+        <div class="col-xs-1">1</div>
+        <div class="col-xs-2">2</div>
+        <div class="col-xs-2">2</div>
+        <div class="col-xs-6">6</div>
+    </div>
+
+
+New elements
+--------------
+
+<thead>
+<tbody>
 
 Font-awesom
 ~~~~~~~~~~~~
