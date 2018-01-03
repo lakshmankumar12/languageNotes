@@ -152,6 +152,9 @@ Rules
 
 ***
 
+Comments:
+[//]: # (This is a comment, it will not be included)
+
 ___
 
 # RAW HTML

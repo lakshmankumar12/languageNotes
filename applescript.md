@@ -92,6 +92,16 @@ The value of this read-only property is a number corresponding to the window’s
 * close: causes a window to close
 * select: causes a window to come to front
 
+## Comments
+
+### Single line comments
+
+Begins with --
+
+```
+  -- This is a single line comment
+```
+
 
 # Collects
 
@@ -203,7 +213,7 @@ The value of this read-only property is a number corresponding to the window’s
     ```
     do shell script "/usr/local/bin/cliclick " & "c:23,23"
     ```
-    
+
 
 # My scripts
 
