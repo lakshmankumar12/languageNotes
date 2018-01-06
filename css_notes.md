@@ -1,17 +1,50 @@
-Referring
----------
+# Including css
 
-plain -> any defined html element
-.className
-#idname
+## External file
+
+```
+<head>
+<link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+```
+
+## Internal style sheet
+
+```
+<head>
+<style>
+body {
+    background-color: linen;
+}
+
+h1 {
+    color: maroon;
+    margin-left: 40px;
+}
+</style>
+</head>
+```
+
+## Plain inlining
+
+```
+<h1 style="color:blue;margin-left:30px;">This is a heading</h1>
+```
+
+# Referring
+
+* plain -> any defined html element
+* .className
+* #idname
 
 * class override in last-written gets weight.
 * Precedence
-   plain-outer <  plain-inner  < class-name-first-defined < class-name-last defined < id < inline
-* !important in class names overrides everthing else.
+    ```
+     plain-outer <  plain-inner  < class-name-first-defined < class-name-last defined < id < inline
+    ```
+* `!important` in class names overrides everthing else.
 
-properties
-----------
+# properties
 
 clear: both
 clear: left
@@ -28,27 +61,31 @@ margin : Outline
 padding : distance from margin
 
 
-Bootstrap:
-----------
-#add-this:
+# Bootstrap:
+
+## Including
+
+add-this:
+```
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
+```
 
 * To get started, we should nest all of our HTML in a div element with the class container-fluid.
 
-For images:
-~~~~~~~~~~~
+## For images:
+
 * Add class "img-responsive" to auto-adjust images! This goes into img tag.
 
-For text:
-~~~~~~~~
+## For text:
+
 * class "text-center" to center-align. These directly go to the h*,p elements
 * class "text-primary"
 * class "text-danger"
 
-For buttons:
-~~~~~~~~~~~~
+## For buttons:
+
 * Add class "btn" to button. Button is only as big as text. Always required for buttons
 * Add class "btn-block" to make button strech to entire hori-width
 * "btn-primary" is the main color for a btton. Use this for your main button
@@ -64,6 +101,7 @@ For buttons:
     **  btn-block
     **  btn-large
 
+## Grid Systems
 
 Bootstrap has a responsive grid system (of size 12).
 
@@ -80,6 +118,8 @@ Medium
 
 xtra-small
 .col-xs-1
+
+## Other notes
 
 <span>...</span> is used to create a division in text.
 
@@ -104,8 +144,8 @@ table-striped
 label
 label-default
 
-Grid layout
-------------
+# Grid layout
+
 
 <div id="gridContainer">
     <div class="row grid-row">
@@ -117,14 +157,12 @@ Grid layout
     </div>
 
 
-New elements
---------------
+# New elements
 
 <thead>
 <tbody>
 
-Font-awesom
-~~~~~~~~~~~~
+# Font-awesom
 
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 
@@ -134,11 +172,14 @@ Font-awesom
 * fa-trash
 * fa-paper-plane
 
-Animate.css
-~~~~~~~~~~~
+# Animate.css
 
 * class="animated" precedes
 * "bounce"
 * "shake"
 * "fadeOut"
 * "hinge"
+
+# Colors
+
+Color picker: https://www.w3schools.com/colors/colors_picker.asp

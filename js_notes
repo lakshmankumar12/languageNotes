@@ -2,9 +2,16 @@ General rules
 -------------
 
 * All variables must be declared before use with var
+* javascript is case-sensitive. lastname and lastName are 2 diff vars.
 
 Literals
 --------
+
+bool literal
+~~~~~~~~~~~~
+
+* true
+* false
 
 string literal:
 ~~~~~~~~~~~~~~~
@@ -84,9 +91,11 @@ Basic Types
 
 Primitive Types
 * Number
+  * Always floating point.
 * strings
 * booleans
 * null
+* Undefined
 
 Native Objects
 --------------
@@ -151,9 +160,12 @@ Read at https://blog.pivotal.io/labs/labs/javascript-constructors-prototypes-and
 Null/Undefined
 --------------
 
-null -> no value
-undefined -> deeper absense ..
-  (non existing variable, return value of fn that didn't return anything)
+* null 
+    * no value
+    * value of a variable that has no initialization.
+* undefined 
+    * deeper absense ..
+    * (non existing variable, return value of fn that didn't return anything)
 
 constructor
 -----------
