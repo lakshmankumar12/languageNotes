@@ -3,6 +3,10 @@
 * All variables must be declared before use with var
 * javascript is case-sensitive. lastname and lastName are 2 diff vars.
 * Does type coersion when say `+` is operated on different data-types.
+* scope is either global or function - not per block like in c. All blocks withing function
+  are in same scope. If you need scope private - use IIFE. Also read notes on
+  execution blocks
+
 
 # Literals
 
@@ -127,6 +131,37 @@ function FunctionName () {
 * No overloading. Last definition overrides other definitions
 * arguments is like a array that can access function args w/o naming them
 
+## closures
+
+```javascript
+function outerFunction(arg1, arg2) {
+    var localvar = something;
+    return function (closureArg1, closureArg2) {
+        return arg1 + localvar + closureArg1;
+    }
+}
+
+var func1 = outerFunction(1,2);
+var finalResult = func1(3,4);
+```
+
+* Pretty much standard like in python
+* closure captures the variables of its creator.
+
+## IIFE
+
+Immediately invoked function expressions.
+
+* Javascript's ways of providing scope-private variables.
+
+```
+(function() {
+   var priv_var1 = 5;
+   ...
+})()
+```
+
+* you can pass args and get things returned as well if you want.
 
 # Basic Types
 
