@@ -1,6 +1,5 @@
 
-Mutex
------
+# Mutex
 
 pthread_mutex_init(&mutex,&attr);
 pthread_mutex_destroy(&mutex);  /* undefined if mutex is locked at destroy ! */
@@ -11,16 +10,18 @@ pthread_mutex_lock(&mutex);
 pthread_mutex_trylock(&mutex);
 pthread_mutex_unlock(&mutex);
 
-Cond-wait
-----------
+# Cond-wait
 
+```c
 int pthread_cond_wait(pthread_cond_t *cptr, pthread_mutex_t *mptr );
 int pthread_cond_timedwait(pthread_cond_t *cptr, pthread_mutex_t *mptr , const timespec *);
 int pthread_cond_signal (pthread_cond_t *cptr);
 int pthread_cond_broadcast (pthread_cond_t *cptr);    /* wakes up all threads waiting */
+```
 
 eg: cond_wait in prod/consumer problem
 
+```c
 struct {
   pthread_mutex_t mutex;
   pthread_cond_t cond;
@@ -28,20 +29,22 @@ struct {
 } nready = {
 PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER
 };
+```
 
-producer:
-~~~~~~~~~
+## producer:
 
+```c
 pthread_mutex_lock(&nready.mutex);
 if (nready.nready == 0) {
   pthread_cond_signal(&nready.cond);            /* Note -- Signalling does nothing about the mutex . You can signal outside the mutex too */
 }
 nready.nready++;
 pthread_mutex_unlock(&nready.mutex);
+```
 
-Alternate:
-+++++++++
+### Alternate:
 
+```c
 auto int do_signal = 0;
 
 pthread_mutex_lock(&nready.mutex);
@@ -54,26 +57,27 @@ pthread_mutex_unlock(&nready.mutex);
 if (do_signal) {
   pthread_cond_signal(&nready.cond);            /* Note -- You can signal outside the mutex too */
 }
+```
 
-consumer:
-~~~~~~~~
+## consumer:
 
+```c
 Pthread_mutex_lock(&nready.mutex);
 while (nready.nready == 0)                            /* while(ready-var) helps in preventing spurious wake up calls
   Pthread_cond_wait(&nready.cond, &nready.mutex);     /* Note: wait releases the mutex. So always call wait within mutex.
                                                          And wait will re-acquire mutex when it returns */
 nready.nready--;
 Pthread_mutex_unlock(&nready.mutex);
+```
 
-read-write-locks
-----------------
+# read-write-locks
 
 pthread_rwlock_t
 
 
-Thread creation
---------------
+# Thread creation
 
+```c
 pthread_t /* data-type to represent a thread's id */
 
 int pthread_create(pthread_t *thread,                             /* result arg - in which the child's id is placed */
@@ -82,6 +86,7 @@ int pthread_create(pthread_t *thread,                             /* result arg 
 
 pthread_t pthread_self(void);
 int pthread_equal(pthread_t lhs, pthread_t rhs);
+```
 
 Termintate thread
 * fall off its start routine
@@ -92,21 +97,20 @@ Termintate thread
 Keeping a threads detached is good, as exited thread resources are help up (like zombie processes) till someother
 thread called pthread_join()
 
-Difference between select/poll
--------------------------------
+# Difference between select/poll
 
 Good write up [here]https://daniel.haxx.se/docs/poll-vs-select.html
 
 Dev-poll splits the telling of which fd's and actual waiting into 2 sys-calls.
 
-----
+```c
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 void FD_CLR(int fd, fd_set *set);
 int  FD_ISSET(int fd, fd_set *set);
 void FD_SET(int fd, fd_set *set);
 void FD_ZERO(fd_set *set);
 int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout, const sigset_t *sigmask);
-----
+```
 * select uses timeval, while pselect uses timespec
 * select updates timeval to reflect how much time was left, while pselect doesn't change timeout.
   This is linux behavior. POSIX per se allows leaving timeval or updating it.
@@ -115,7 +119,7 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, cons
 * pselect avoid the signalling race-cond by clubbing sigprocmask in one go.
 * FD_SETSIZE is the max size of fd_set
 
-----
+```c
 int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask);
 struct pollfd {
@@ -123,18 +127,20 @@ struct pollfd {
     short events;     /* requested events */
     short revents;    /* returned events */
 };
-----
+```
 * timeout is in milliseconds
 * events is one of POLLIN/POLLOUT/+ lots of POLLERR, POLLHUP
 
-epoll
-----
+## epoll
+
+```c
 int epoll_create(int size);
 int epoll_create1(int flags);
 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
 int epoll_pwait(int epfd, struct epoll_event *events, int maxevents, int timeout, const sigset_t *sigmask);
-----
+```
+
 * Create a epoll instance. size is old and ignored. flags is for setting O_CLOEXEC
 * ctl sets up a fd, with one of the options and a usr-ata
 * wait gets the list of fd along with the events in it.
@@ -143,13 +149,13 @@ int epoll_pwait(int epfd, struct epoll_event *events, int maxevents, int timeout
   ready until we get a EGAGIN on a subsequent read/write.
 
 
-Different between mutex and semaphore
--------------------------------------
+# Different between mutex and semaphore
 
 Good explanation at http://stackoverflow.com/questions/62814/difference-between-binary-semaphore-and-mutex/86021#86021
 
 * At the outset, mutex is for exclusive access, semaphore is for a limiting access to a certain count.
-----
+
+```c
 Mutex - Exclusive access.
 
 Lock
@@ -161,7 +167,8 @@ Semaphore ( has an associated count against it).
 take()
 work();
 give()
-----
+```
+
 * Other characteristic is that mutex is used for exclusion(locking), while semaphare is used for signalling.
   The first task waits till something is ready, while the second task signals when that is available.
 * Mutex is typically same-task should release. (true to spirit of locking).
@@ -171,28 +178,26 @@ give()
 
 If locking is what is required, use a mutex and not a semaphore with count 1. (Why? To Read)
 
-Other questions around here
-+++++++++++++++++++++++++++
+## Other questions around here
 
 1. Can a thread acquire more than one lock (Mutex)?
-    Yes
+   * Yes
 2. Can a mutex be locked more than once?
-    Normal mutex- no. Recursive mutex-yes. Must be unlocked as many times.
+   * Normal mutex- no. Recursive mutex-yes. Must be unlocked as many times.
 3. What happens if a non-recursive mutex is locked more than once.
-    Deadlock.
+   * Deadlock.
 4. Binary semaphore and mutex is same?
-    No.
+   * No.
 5. Mutext and critical section.
-   Synonyms, for purpose. BUt some OS crit-section means, disable interrupts and run. So cheap
-   but may make CPU non-responsive!
+   * Synonyms, for purpose. BUt some OS crit-section means, disable interrupts
+     and run. So cheap but may make CPU non-responsive!
 6. Can we acquire mutex/semaphore in an Interrupt Service Routine?
-   Not recommended. However, a ISR can typically signal a semaphore.
+   * Not recommended. However, a ISR can typically signal a semaphore.
 7. Should a thread block if a resource is unavailable?
-   Not necessary. That's why posix has try_lock() which will return -ve immdly. The thread as
-   per design can go do other things.
+   * Not necessary. That's why posix has try_lock() which will return -ve immdly.
+     The thread as per design can go do other things.
 
-Different types of synchronization primitives
---------------------------------------------
+# Different types of synchronization primitives
 
 atomic variables
 spin locks
@@ -215,12 +220,11 @@ std::recursive_mutex
 std::recursive_timed_mutex
 std::shared_timed_mutex
 
-std::lock_guard<>
-std::unique_lock<>
-std::shared_lock<>
+`std::lock_guard<>`
+`std::unique_lock<>`
+`std::shared_lock<>`
 
-Difference between Process and Threads
-----------------------------------------
+## Difference between Process and Threads
 
 Resources that are shared
  (man clone(2) gives a bunch of them)
@@ -241,16 +245,14 @@ When we say a thread, generally its just has only the stack that is private. Oth
 Processes on the other hand, have everything for itself.
  However, when a process forks, certain things are shared between parent & child.
 
-Context switch
----------------
+# Context switch
 
 In linux traditionally the ticks are tracked on time spent on user-space by a
 process, kernel-space by a process. Sometimes interrupts are processed in the context
 of a process in kernel-space. Typically the cpu of a process is the (user-time+kernel-time)/clock-time
 
 
-Dining Philosopher Issue
--------------------------
+# Dining Philosopher Issue
 
 Problem:
 * Circular table, Every philosopher needs both side chopsticks. If every one acquire left side
@@ -263,8 +265,7 @@ Solution
   and higher number next. Every philosopher will pick in one order except the last philosohper who
   will pick in the other order, thus breaking the cycle.
 
-Deadlock-free class
--------------------
+# Deadlock-free class
 
 * Design a lock class that will lock, only if there is no dead-lock.
 Solution
@@ -273,8 +274,7 @@ Solution
   formed when adding a edge.
   (We can use DFS to detect the cycle).
 
-Call-Order
-----------
+# Call-Order
 
 Assume a signleton class. It has 3 methods. first(), second(), third(). How do u ensure,
 they are strictly called in order. first should finish, and then second should proceed etc..
@@ -283,8 +283,7 @@ assumed 3 threads will independantly endup calling the functions.
 Hold 2 semaphores (cond_wait(). Signl them after first is complete, and second is complete()
 
 
-Synchronization Methods
------------------------
+# Synchronization Methods
 
 We have a class with one serialized methond and one normal one. Can 2 threads execute the 2
 methonds concurrently
@@ -293,8 +292,7 @@ Basically serialized is like holding a instance level lock and then executing th
 So, while the call itself will happen, whether it will produce desired results depends on
 the design on the class and what elements are accessed.
 
-FizzBuzz
---------
+# FizzBuzz
 
 You have 4 threads. One tread prints multiples of 3&5, one that of 3, one that of 5 and one
 the result. How will you make all 4 synchronize.
@@ -304,19 +302,20 @@ local variable, and if its condition matches it preints that.
 
 Here is the snippet
 
+```c
   lock.acquire();
   if (my_condition_satisfies){
     print("%d - %s",current,mystring);
     current++;
   }
   lock.release();
+```
 
 Note that one thread will take the lock. But it will silently do nothing, if its conditions
 didn't match.  The flipside is that there are too many spurious runs. To think of something
 more efficient.
 
-Linux and threads
------------------
+# Linux and threads
 
 * pthread defines the notion of a processid and a thread id.
    process id is globally unique in system, while thread-id is local to the process.
@@ -329,8 +328,7 @@ Linux and threads
   clone() and futex() system calls
 
 
-Fork in multi-threaded program
-------------------------------
+# Fork in multi-threaded program
 
 * fork() in a multi threaded program is mostly a disaster.
   -> only calling thread is alive in the child.
@@ -357,14 +355,12 @@ prepare handler mutexes are locked, in the parent handler unlocked and in the
 child handler reinitialized.
 
 
-Signals
-------
+# Signals
 
 * In a process with many threads
 
 
-Time
-----
+# Time
 
 time_t -> seconds
 timeval -> micro sec
@@ -381,12 +377,11 @@ memory barrier/compiler memory barrier
 rdtsc
 rdtscp
 
-Read/Write
------------
+## Read/Write
 
 sendmmsg() is a api to send multiple messages in one go.
 
-----
+```c
 int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, unsigned int flags);
 
 /*msg_hdr itself is as per sendmsg */
@@ -394,6 +389,6 @@ struct mmsghdr {
     struct msghdr msg_hdr;  /* Message header */
     unsigned int  msg_len;  /* Number of bytes transmitted */
 };
-----
+```
 
 
