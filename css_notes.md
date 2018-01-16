@@ -1,3 +1,89 @@
+# Study links
+
+W2school: https://www.w3schools.com/css/default.asp
+
+
+# selectors
+
+* p                 -> w/o any prefix : actual html element
+* .class_name       -> dot-prefix for classnames
+* #id_name          -> hash-prefix for id
+* p.class_name      -> p elements with that class name
+* h1, h2, p {  }    -> you can group different elements to the same description
+* a:state           -> element,colon,state. For eg, a-tag have 4 states: link, visited, hover, active
+
+## Precedence
+
+* class override in last-written gets weight.
+* Precedence
+    ```
+     plain-outer <  plain-inner  < class-name-first-defined < class-name-last defined < id < inline
+    ```
+* `!important` in class names overrides everthing else.
+
+# various css properties
+
+* color                     -> plain text color
+
+* background-color          -> background color
+* background-image: url('../wherever/image.jpg')
+* background-repeat: repeat-x/repeat-y/no-repeat
+* background-position: right top
+* background-attachment: fixed          (means the image wont scroll along with page)
+* background: <color> <image> <repeat> <attachment> <position>         (all in one)
+
+* border-style: dotted/dashed/solid/double/groove/ridge/inset/outset/none/hidden
+* border-size: px/pt/cm/em/../  or thin/medium/thick
+* border-color
+* border:<size> <style> <color>       -> border specification, size, style and color
+* border-{top,right,bottom,left}-style
+* border-radius: px                   -> for rounded border, the radius
+* outline has similar properties
+
+* margin                              -> auto, length, percent(of containing element), inherit
+* margin-{top,right,bottom,left}
+
+* width                               -> width of element alone. (total = left+padding + width + right-padding)
+* max-width
+* min-width
+* padding                             -> length
+* padding-{top,right,bottom,left}
+* box-sizing: border-box              -> ensure the padding + width == total width of element
+
+* text
+* color:
+* text-align: center/left/right/justify
+* text-decoration: none/overline/underline/line-through
+* text-transform: uppercase/lowercase/capitalize
+* text-indent: 50px                    -> for first line
+* letter-spacing: 3px                  -> between chars in a text
+* line-height: 0.8                     -> between lines (note, not in pixel but as mutiple of a line)
+* direction: rtl
+* word-spacing: 10px
+* text-shadow: <horizontal> <vertical> <color>
+
+* *display*  -  block/inline/hidden     -> block is a for starting on a new line, inline is to continue
+
+* visibility - hidden (also hides, but the layout is affected)
+
+## properties
+
+clear: both
+clear: left
+clear: right
+
+No floating elements are allowed on mentioned side
+
+display: None
+
+  Hides the element.
+
+
+margin : Outline
+padding : distance from margin
+
+
+
 # Including css
 
 ## External file
@@ -30,36 +116,6 @@ h1 {
 ```
 <h1 style="color:blue;margin-left:30px;">This is a heading</h1>
 ```
-
-# Referring
-
-* plain -> any defined html element
-* .className
-* #idname
-
-* class override in last-written gets weight.
-* Precedence
-    ```
-     plain-outer <  plain-inner  < class-name-first-defined < class-name-last defined < id < inline
-    ```
-* `!important` in class names overrides everthing else.
-
-# properties
-
-clear: both
-clear: left
-clear: right
-
-No floating elements are allowed on mentioned side
-
-display: None
-
-  Hides the element.
-
-
-margin : Outline
-padding : distance from margin
-
 
 # Bootstrap:
 
@@ -119,6 +175,19 @@ Medium
 xtra-small
 .col-xs-1
 
+<div id="gridContainer">
+    <div class="row grid-row">
+        <div class="col-xs-1">1</div>
+        <div class="col-xs-1">1</div>
+        <div class="col-xs-2">2</div>
+        <div class="col-xs-2">2</div>
+        <div class="col-xs-6">6</div>
+    </div>
+
+## Grid in basic css
+
+https://css-tricks.com/snippets/css/complete-guide-grid/
+
 ## Other notes
 
 <span>...</span> is used to create a division in text.
@@ -144,27 +213,18 @@ table-striped
 label
 label-default
 
-# Grid layout
-
-
-<div id="gridContainer">
-    <div class="row grid-row">
-        <div class="col-xs-1">1</div>
-        <div class="col-xs-1">1</div>
-        <div class="col-xs-2">2</div>
-        <div class="col-xs-2">2</div>
-        <div class="col-xs-6">6</div>
-    </div>
-
-
 # New elements
 
 <thead>
 <tbody>
 
-# Font-awesom
+# Fonts or Icons
+
+## font-awesome
 
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+Icons: https://github.com/driftyco/ionicons
+Google Material Icons
 
 * <i class="fa"></i>
 * fa-thumbs-up
