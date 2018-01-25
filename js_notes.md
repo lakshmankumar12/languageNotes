@@ -486,6 +486,81 @@ onload
 # JS libraries
 
 Math.random()   /* gives a random number between 0 and 1 */
+```javascript
+//Inclusive of 1 and 6
+Math.floor(Math.random() * 6) + 1;
+```
+
+
+# Jquery
+
+## Including
+
+```html
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+```
+
+## Basic syntax
+
+```
+$(selector).action()
+```
+
+eg:
+
+```
+$(this).hide()
+$("p").hide()
+$(".someclass").hide()
+$("#specficElemByID").hide()
+```
+
+## Jquery functions
+
+```
+$(document).ready(function() {
+    your code to run on document ready
+});
+```
+
+```
+$("#someButton").click(function() {
+  // event handler for a button click!
+});
+```
+
+Using the on-method to add event handler
+```
+$("#someButton").on('click', function() {
+
+});
+
+$("#someButton").on({
+    mouseenter: function() {
+        $(this).css("background-color","light-gray");
+    },
+    mouseleave: funciton() {
+        $(this).css("background-color","light-blue");
+    },
+    'click': function() {
+    });
+```
+
+* text, html and value
+
+```
+var textAt = $("#someElem").text();
+var htmlAt = $("#someElem").html();
+var valAt = $("#someElem").val();
+
+$("#someElem").text("new repalce text")
+```
+
+# Google charts
+
+[Link][https://developers.google.com/chart/interactive/docs/quick_start]
 
 
 # Kitchen Sink
