@@ -21,16 +21,7 @@
 * \ escapes. \' and \" respectively escape single and double quote in a double and single quote string.
 * double/single is automatically escaped in single/double quote string.
 
-### stringize
-
-```
-var num = 15;
-var s = num.toString();
-
-var s = '120';
-var n = Number(s);
-```
-
+See string functions below
 
 ## object literal
 
@@ -65,6 +56,20 @@ Inside slashes
 ```
 / ... /
 ```
+
+## Other common datatypes
+
+* Array
+    * splice
+    * foreach
+    * map
+    * indexOf  -- -1 if elem is not found
+    * slice    -- create a copy
+    * splice(index, number)  -- removes number elements at index and edits array in place.
+* List -> not sure when, but if u have a list, use this to covert to array
+    ```
+    fieldsArr = Array.prototype.slice.call(fieldsList);
+    ```
 
 ## comments
 
@@ -109,6 +114,9 @@ for ( initial_expr ; condition ; incr_expr ) {
 for ( var i = 0 ; i < array_var.length ; ++i ) {
 
 }
+
+array_var.foreach(func_to_operate);
+// func_to_operate(curr, index, full_array) {}
 
 break;
 continue; // as in c.
@@ -177,7 +185,7 @@ Immediately invoked function expressions.
 Primities directly store their values. Objects store references.
 Every var is either a primitive or an object
 
-# Native Objects
+## Native Objects
 
 * provided by the EMEA implementation. Always available
 
@@ -348,45 +356,21 @@ aPerson.prop1 = "value1";
 
 # string functions
 
-string manipulations
+```
+var num = 15;
+var s = num.toString();
+
+var s = '120';
+var n = Number(s);
+```
+
+* resultArr = string.split('-')
 
 str.length
 string[index]  .. gives single char at index
 string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-index
 str.substring(beg_index,end_index)
-
 new_string = string.replace("old_literal_text","new_literal_text");
-
-# Jquery
-
-## Objects
-
-```
-$(document)      <-- Entire doc
-$("button")      <-- All elemetns of that type
-$(".class-name") <-- All elements of this class
-$("#id")         <-- Exact Element with this id
-```
-
-## Functions
-
-```
-$("#elementSelector").addClas("animated-bounce");
-$("#elementSelector").css("property","value");
-$("#elementSelector").prop("property",value);
-
-$("#elementSelector").html(htmlContent);   // Replaces html content
-$("#elementSelector").text(textContent);   // Replaces html content w/o tags
-$("#elementSelector").remove();            // Removes an entire element
-$("#elementSelector").appendTo("#targetElement"); // Moves this to target
-$("#elementSelector").clone();             // Clones and returns the new element, so that u can chain the netxt function
-.parent()
-.children()
-$("...:nth-child(1-based-index)")
-$("...:odd")
-
-$("#elementSelector").append(htmlContent);
-```
 
 # execution context
 
@@ -421,6 +405,8 @@ Each execution context kind of conceptually has:
 
 # Js functions in a browser
 
+Good referece at https://blog.garstasio.com/you-dont-need-jquery/
+
 * console.log(string) prints the string in browser console
 * str_var = prompt(string) prints the string and gets a string and assigns it to the str_var
 * alert(string) will just print the string in a pop-up-ish box
@@ -432,18 +418,33 @@ document.querySelector('')  // either #id, .class - gets the first element with 
 document.getElementbyId('id_without_hash')   // faster than querySelector()
 
 someDomElement.addEventListener('event-name', function)
+// function(event) {}
 someDomElement.classList.add('className')        // Dont call if you aren't sure. Remove and add
 someDomElement.classList.remove('className')     // Okay to remove even if its not there
 someDomElement.classList.toggle('className')
 
 getElementsByTagName
 
+## event handler event properties
+
+* which - older property for key codes
+* keycode
+* target
+
+## Event delegation
+
+event fires up on parent dom elements too.
+
 ## DOM element properties
 
-someElement.textContent
-someElement.innerHTML
-someElement.style.display = "none"
-someElement.
+someElement.textContent;
+someElement.innerHTML;
+someElement.style.display = "none";
+someElement.value;                 -- typically for input fields
+someElement.insertAdjacentHTML('beforebegin/beforeend/afterbegin/afterend', newHtml);
+someElement.focus();
+someElement.parentNode;
+someElement.id;
 
 ## add and remove elements
 
@@ -474,7 +475,7 @@ while (myNode.firstChild) {
 
 Just type in a var, and the browser will let you know its value.
 
-# HTML Div events
+# HTML events
 
 ```
 <div onclick="message('hi')">
@@ -483,12 +484,29 @@ onresize
 onload
 ```
 
+* click
+* change
+* keypress
+
+Refer: https://developer.mozilla.org/en-US/docs/web/events
+
+## Key codes
+
+http://keycodes.atjayjo.com/#
+
+
 # JS libraries
 
 Math.random()   /* gives a random number between 0 and 1 */
 ```javascript
 //Inclusive of 1 and 6
 Math.floor(Math.random() * 6) + 1;
+```
+
+* Get a random value from array
+
+```javascript
+var rand = myArray[Math.floor(Math.random() * myArray.length)];
 ```
 
 
@@ -502,19 +520,35 @@ Math.floor(Math.random() * 6) + 1;
 </head>
 ```
 
-## Basic syntax
+## Objects
 
 ```
-$(selector).action()
+$(document)      <-- Entire doc
+$("button")      <-- All elemetns of that type
+$(".class-name") <-- All elements of this class
+$("#id")         <-- Exact Element with this id
+$(this)
 ```
 
-eg:
+## Functions
 
 ```
-$(this).hide()
-$("p").hide()
-$(".someclass").hide()
-$("#specficElemByID").hide()
+$("#elementSelector").addClas("animated-bounce");
+$("#elementSelector").css("property","value");
+$("#elementSelector").prop("property",value);
+
+$("#elementSelector").html(htmlContent);   // Replaces html content
+$("#elementSelector").text(textContent);   // Replaces html content w/o tags
+$("#elementSelector").remove();            // Removes an entire element
+$("#elementSelector").appendTo("#targetElement"); // Moves this to target
+$("#elementSelector").clone();             // Clones and returns the new element, so that u can chain the netxt function
+.parent()
+.children()
+$("...:nth-child(1-based-index)")
+$("...:odd")
+
+$("#elementSelector").append(htmlContent);
+$("#elementSelector").hide()
 ```
 
 ## Jquery functions
