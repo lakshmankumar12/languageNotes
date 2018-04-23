@@ -50,7 +50,8 @@ W2school: https://www.w3schools.com/css/default.asp
 * min-width
 * padding                             -> length
 * padding-{top,right,bottom,left}
-* box-sizing: border-box              -> ensure the padding + width == total width of element
+* box-sizing: border-box              -> ensure the broder + padding + content-width == total width of element
+              content-box             -> only content
 
 * text
 * color:

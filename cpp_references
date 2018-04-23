@@ -34,9 +34,11 @@ int main () {
 Line based reading
 ~~~~~~~~~~~~~~~~~
 
+#include <iftream>
 #include <sstream>
 #include <string>
 
+ifstream infile('filename.txt');
 std::string line;
 while (std::getline(infile, line))
 {
@@ -46,6 +48,22 @@ while (std::getline(infile, line))
 
     // process pair (a,b)
 }
+
+Extracting tokens of a string
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+std::string s = "scott>=tiger>=mushroom";
+std::string delimiter = ">=";
+
+size_t pos = 0;
+std::string token;
+while ((pos = s.find(delimiter)) != std::string::npos) {
+    token = s.substr(0, pos);
+    std::cout << token << std::endl;
+    s.erase(0, pos + delimiter.length());
+}
+std::cout << s << std::endl;
+
 
 Printing format control
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,6 +165,7 @@ std::string s = std::accumulate(std::next(v.begin()), v.end(),
 
 upper-bound/lower-bound
 +++++++++++++
+get-next/higher/value
 
 /* returns iter to first element, that is more than a */
 upper_bound(v.begin(), v.end(), a);
@@ -226,7 +245,7 @@ string trim(const string& str)
     size_t first = str.find_first_not_of(' ');
     if (string::npos == first)
     {
-        return str;
+        return "";
     }
     size_t last = str.find_last_not_of(' ');
     return str.substr(first, (last - first + 1));
@@ -295,6 +314,7 @@ m[key] = v;
 
 User the [] if you want to insert/assign w/o caring if its already there. Note that the default value gets created if
 it doesn't exist. You can use the m.insert() if you want to check for exclusive-insert
+pair<it,bool> = m.insert(pair<K,V> kv)
 
 
 //key exists in map
@@ -374,3 +394,17 @@ There is no inherent next_combination, but we can use a bool-set to get next_com
 See: http://stackoverflow.com/a/9430993/2587153
 
 
+Remove while iterating
+---------------------
+
+for (auto it = m.cbegin(); it != m.cend() /* not hoisted */; /* no increment */)
+{
+  if (must_delete)
+  {
+    m.erase(it++);    // or "it = m.erase(it)" since C++11
+  }
+  else
+  {
+    ++it;
+  }
+}

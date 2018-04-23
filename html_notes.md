@@ -51,9 +51,24 @@ Refer to JS notes - HTML events
 
 ## Table related
 
+```
 <thead>
 <tbody>
+```
 
+## div-like
+
+```
+<header>
+<footer>
+<nav>
+<section>
+
+```
+
+# Attributes
+
+* tabindex   -- controls in which order tab moves
 
 # Web design
 

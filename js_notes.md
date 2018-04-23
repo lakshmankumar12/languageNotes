@@ -8,73 +8,6 @@
   execution blocks
 
 
-# Literals
-
-## bool literal
-
-* true
-* false
-
-## string literal
-
-* Strings can be single quotes or double quotes
-* \ escapes. \' and \" respectively escape single and double quote in a double and single quote string.
-* double/single is automatically escaped in single/double quote string.
-
-See string functions below
-
-## object literal
-
-* In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen. Otherwise string can be omitted.
-* Empty string is a property too
-* Properties are separated by comma. Colon and the value are separated by a space. Note the finishing }; like in c-struct definition.
-* Objects can nest
-
-```
-var flight= {
-  airline: "Oceanic",
-  number: 815,
-  departure: {
-    IATA: "SYD",
-    time: "2004-09-22 14:55",
-    city: "Sydney"
-  },
-  arrival: {
-    IATA: "LAX",
-    time: "2004-09-23 10:42",
-    city: "Los Angeles"
-  }
-};
-
-```
-
-## regex literal
-
-Inside slashes
-
-
-```
-/ ... /
-```
-
-## Other common datatypes
-
-* Array
-    * splice
-    * foreach
-    * map
-    * indexOf  -- -1 if elem is not found
-    * slice    -- create a copy
-    * splice(index, number)  -- removes number elements at index and edits array in place.
-* List -> not sure when, but if u have a list, use this to covert to array
-    ```
-    fieldsArr = Array.prototype.slice.call(fieldsList);
-    ```
-
-## comments
-
-cpp like. Single line with `//` and multiple line with `/* .. */`
-
 # Operators
 
 * `+` adds numbers or does string concat.. It coverts number to string
@@ -85,6 +18,12 @@ cpp like. Single line with `//` and multiple line with `/* .. */`
 `==`  does equality checking after type coercion
 
 # Constructs
+
+## variable declaration
+
+* See notes on execution context/scope chain.
+
+## statements - if/for/switch/while
 
 /* pretty much c-like looking */
 
@@ -171,19 +110,55 @@ Immediately invoked function expressions.
 
 * you can pass args and get things returned as well if you want.
 
+## ES6 arrow funcitons
+
+* wherever a callback fn is reqd, just use a varname, array and expression
+* if more than one var as arg, just use parenthesis
+* if expression is longer, use {}. However, now u should explicitly return
+
+## bind/apply
+
+* They seem to manipulate the this for a function.
+
 # Basic Types
 
 ## Primitive Types
 
 * Number
-  * Always floating point.
+    * Always floating point.
+    * see number functions below
 * strings
+    * Strings can be single quotes or double quotes
+    * \ escapes. \' and \" respectively escape single and double quote in a double and single quote string.
+    * double/single is automatically escaped in single/double quote string.
+    * See string functions below
 * booleans
+    * true/false (all small letters)
 * null
-* Undefined
+    * no value
+* undefined
+    * deeper absense ..
+    * value of a variable that has no initialization.
+    * (non existing variable, return value of fn that didn't return anything)
+
 
 Primities directly store their values. Objects store references.
 Every var is either a primitive or an object
+
+### Other literals
+
+#### regex literal
+
+Inside slashes
+
+
+```
+/ ... /
+```
+
+#### comments
+
+cpp like. Single line with `//` and multiple line with `/* .. */`
 
 ## Native Objects
 
@@ -199,24 +174,62 @@ Every var is either a primitive or an object
 
 * 0 indexed.
 * can be heteregenous
-* array.length     // Its a property, so no paranthesis
-* array.push(obj)  // Adds a element at end of array
-* array.pop()      // Removes a element at beg of array
-* array.join(" ")  // Uses arg to build a string
+* array.length
+    * Its a property, so no paranthesis
+* array.push(obj)
+    * Adds a element at end of array
+* array.pop()
+    * Removes a element at beg of array
+* array.unshift()
+    * Adds to beginning of array
+* array.join(" ")
+    * Uses arg to build a string
 * array.split( )
 * array.concat( )
-* array.slice( )
-* array.push()      // Adds to end of array
-* array.pop()
-* array.unshift()   // Adds to beginning of array
+* array.slice(start, [end])
+    * python-like. creates a copy
+* array.splice(index, number)
+    * removes number elements at index and edits array in place.
 * array.shift()
-* array.indexOf(element)   // returns index if present, else -1
+* array.indexOf(element)
+    * returns index if present, else -1
 
 * setting to an index that doesn't exist -> what happens?
     * If its just length+1, it gets set and array grows.
     * Not sure when its some arbitrary index.
 
+### ES6 additions
+
+* array.find()
+
+### iterating
+
+* plain for
+```
+for ( var i = 0 ; i < array_var.length ; ++i ) {
+
+}
+```
+* array.foreach
+```
+array_var.foreach(func_to_operate(curr, index, full_array){
+
+});
+```
+## list type
+
+* List -> not sure when, but if u have a list, use this to covert to array
+    ```
+    fieldsArr = Array.prototype.slice.call(fieldsList);
+    ```
+
+
 ## Date
+
+* var now = Date();
+* var christmas = Date(2016, 12, 25);
+* var year = dt.getFullYear();   -- as a number
+* var month = dt.getFullMonth();   -- as a number
 
 
 # Objects
@@ -266,6 +279,31 @@ Attempting to retrieve values from undefined will throw a TypeError exception. T
     flight.equipment                               // undefined
     flight.equipment.model                         // throw "TypeError"
     flight.equipment && flight.equipment.model     // undefined
+```
+
+## object literal
+
+* In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen. Otherwise string can be omitted.
+* Empty string is a property too
+* Properties are separated by comma. Colon and the value are separated by a space. Note the finishing }; like in c-struct definition.
+* Objects can nest
+
+```
+var flight= {
+  airline: "Oceanic",
+  number: 815,
+  departure: {
+    IATA: "SYD",
+    time: "2004-09-22 14:55",
+    city: "Sydney"
+  },
+  arrival: {
+    IATA: "LAX",
+    time: "2004-09-23 10:42",
+    city: "Los Angeles"
+  }
+};
+
 ```
 
 
@@ -332,15 +370,6 @@ aPerson.prop1 = "value1";
   as argument to constructor
 
 
-# Null/Undefined
-
-* null
-    * no value
-* undefined
-    * deeper absense ..
-    * value of a variable that has no initialization.
-    * (non existing variable, return value of fn that didn't return anything)
-
 # Useful functions
 
 * anyobject.hasOwnProperty("property")
@@ -365,12 +394,17 @@ var n = Number(s);
 ```
 
 * resultArr = string.split('-')
+* str.length
+* string[index]  .. gives single char at index
+* string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-index
+* str.substring(beg_index,end_index)
+* new_string = string.replace("old_literal_text","new_literal_text");
 
-str.length
-string[index]  .. gives single char at index
-string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-index
-str.substring(beg_index,end_index)
-new_string = string.replace("old_literal_text","new_literal_text");
+
+# number functions
+
+* number.toFixed(2)    -- rounds to the given number, returns a string. has extr 0's if reqd
+
 
 # execution context
 
@@ -391,6 +425,8 @@ Each execution context kind of conceptually has:
     * points to the object upon which a method is called
     * Note that this is assigned value only at time of execution just before the fn-call
 
+* var keyword does variable hoisting at function scope.
+* ES6: let/const does block scope - and no hoisting. Its like regular c'like behavior
 
 * In a browser, that's the window object
 * document object refers to the full html document we are rendering

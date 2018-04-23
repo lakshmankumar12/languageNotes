@@ -119,6 +119,14 @@ friend Object& operator++( Object&, int ) // Postfix increment
 
 Adding explicit to a constructor prevents implicit invocation to convert types
 
+== Links
+
+* Memory model , single-producer, single-consumer no lock
+   https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular
+* Lockless, multi-producer, multi-consumer
+   http://www.linuxjournal.com/content/lock-free-multi-producer-multi-consumer-queue-ring-buffer?page=0,2
+
+
 == On the roll
 
 === Bad stuff list
