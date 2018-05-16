@@ -7,15 +7,15 @@ mov $1, %eax
 
  => move immediate value of 1 to eax
 
-mov %eax, %ebx 
+mov %eax, %ebx
 
  => move value in eax to ebx.
 
-mov (%eax), %ebx 
+mov (%eax), %ebx
 
  => move value in location pointed by eax to ebx.
 
-mov 4(%eax), %ebx 
+mov 4(%eax), %ebx
 
  => move value in location pointed by (eax+4) to ebx.
 
@@ -23,8 +23,8 @@ mov 4(%eax,%ecx),%ebx
 
  => move value in location pointed by (eax+ecx+4) to ebx.
 
-mov    (%ecx,%eax,8),%edx    
-mov   4(%ecx,%eax,8),%edx    
+mov    (%ecx,%eax,8),%edx
+mov   4(%ecx,%eax,8),%edx
 
  =>     ((%eax * 8) + %ecx). Take the value at this address and move to edx
  => 4 + ((%eax * 8) + %ecx). Take the value at this address and move to edx
@@ -39,24 +39,24 @@ cmp %eax, %ebx
     if both are equal, then set zero
     if XOR of (overflow/sign) is 1, then ebx is < eax
 
-test   %eax,%eax 
-  
+test   %eax,%eax
+
  => check if eax is 0, and if 0 sets ZF. MOst likely followed with je (was 0) or jne (wasn't 0)
 
 xor %edi, %edi
-  
+
  => this is same as 'mov $0,%edi'. Usually preferred over mov for taking lesser space.
 
 shl $0x18, %esi
- 
+
  => shift left %esi by 0x18 bits always filling 0 in lsb. The shift bits are lost (except for last, which goes into carry)
 
-shld   $0x18,%edx,%edi 
-  
+shld   $0x18,%edx,%edi
+
  =>  will shift the bits in %edi by $0x18 bits filling the new lsb with msb bits of %edx
 
 lea    0x0(%esi,%eiz,1),%esi
- 
+
  => Just another nop (for 4 byte nop)!
 
 movzbl  0x01(%eax,%ecx),%eax
@@ -70,7 +70,7 @@ sar 0x1f, %edx
 sal %cl, %edx
 
   => Right/Left shift the 2nd register by 1st-register's value time. (Compilers are usually intelligent enuf to use only one-byte of the register)
-  => sh* doesn't extend sign bit. sar does. sal/shl are exactly the same. 
+  => sh* doesn't extend sign bit. sar does. sal/shl are exactly the same.
   => shl/sal puts the last lost bit in carry flag
 
 
@@ -100,7 +100,7 @@ mov %esp, %ebp
 push <some-more-registers that are garbled here>
 sub <some-good-value>,%esp  <-- this value is the scratch that this frame uses.
 
-Now onwards: 
+Now onwards:
 
 positive-offset(%ebp) are args to this function.
 negative-offset(%ebp) are local-scratch area to this function, could be local vars or just scratch area.
@@ -108,7 +108,7 @@ negative-offset(%ebp) are local-scratch area to this function, could be local va
 at exit:
 
 pop <registers that were pushed in reverse order>
-pop %ebp  
+pop %ebp
 ret
 
 --or--
