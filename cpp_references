@@ -408,3 +408,6 @@ for (auto it = m.cbegin(); it != m.cend() /* not hoisted */; /* no increment */)
     ++it;
   }
 }
+
+
+https://www.think-cell.com/en/career/talks/pdf/think-cell_talk_memorymodel.pdf
