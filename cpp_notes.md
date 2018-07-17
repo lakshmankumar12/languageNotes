@@ -549,8 +549,57 @@ Operators
   throw some_var_name; // will throw a copy of whatever
                           this name is referring.
 
+# CPP Std Lib Book (Packt Pub)
 
-## Questions to check
+## Ch2: The standard library
+
+### High level concepts
+
+* Sequential Containers
+    * std::vector         -- SHOULD BE FIRST CHOICE
+    * std::array
+    * std::deque
+    * std::list
+    * std::forward_list
+* Associative Containers
+    * std::set / set:: multiset
+    * std::map / set:: multimap   -- MAP SHOULD BE FIRST CHOICE
+    * unordered for all 4 above
+* Container Adaptor
+    * std::stack
+    * std::queue
+    * std::priority_queue
+* Iterators
+* Callables
+    * functions
+    * function-objects
+    * lambda-functions
+* Memory Model
+* Thread
+    * thread-local
+* Conditional Variables
+* Tasks
+
+### Using
+
+* using declaration: Just brings in one name
+    ```
+    using std::cout;
+    ```
+* using directive: Brings everything. Use with care.
+    ```
+    using std;
+    ```
+* namespace alias. Shoudn't hide a name though.
+    ```
+    namespace sysClock= std::chrono::system_clock;
+    auto nowFirst= sysClock::now();
+    ```
+## Ch3: Utility Functions
+
+* min, max, minmax
+
+# Questions to check
 
 * c-style cast is this
     (T)expr

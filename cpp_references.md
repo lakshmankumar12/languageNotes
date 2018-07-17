@@ -437,4 +437,9 @@ for (auto it = m.cbegin(); it != m.cend() /* not hoisted */; /* no increment */)
 
 # Reading links
 
+http://thbecker.net/articles/rvalue_references/section_01.html
+https://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers
 https://www.think-cell.com/en/career/talks/pdf/think-cell_talk_memorymodel.pdf
+
+* from sccl library
+http://proquest.safaribooksonline.com.sclibrary.idm.oclc.org/book/programming/cplusplus/9781787121706
