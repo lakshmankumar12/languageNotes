@@ -106,6 +106,7 @@ Just type is as is. A Definition list is most useful.
    spaces are not required.)
 
 * Unordered list can use asterisks
+    * lists under lists just indent below. No double asteriks
 - Or minuses
 + Or pluses
 
