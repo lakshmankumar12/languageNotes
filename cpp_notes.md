@@ -41,6 +41,9 @@ constexpr double square(double x) { return x∗x; }   // a constexpr function ca
 
 ### Initializer list
 
+* Use the {} when in doubt. It can initialize simple things like int, or vectors!
+* It enforces type check. `int i=7.2;` will be accepted, but `int i{7.2}` will not.
+
 ```
 std::initializer_list<T> lst;
  Has the following attributes
@@ -82,6 +85,13 @@ std::move(x);
 =delete; can be used to suppress any operation, that the compiler does for free.
 ```
 
+### static asserts
+
+```
+assert(4<=sizeof(int), "integers are too small");
+```
+
+
 
 ## Signatures for common function
 
@@ -119,6 +129,24 @@ friend Object& operator++( Object&, int ) // Postfix increment
 ## Miscellaneous notes
 
 Adding explicit to a constructor prevents implicit invocation to convert types
+
+### What are aggregate/non-aggregate and PODs
+
+https://stackoverflow.com/questions/4178175/what-are-aggregates-and-pods-and-how-why-are-they-special
+
+In short, Aggregates:
+* Shouldn't have explicit copy/default constructor
+* No private/protectd non-static members
+* Can have user-defined assignment-operator/destructor
+* Array is an aggregate, even if its array of non-aggregate type
+
+Basically, Aggregates can be in C++03, brace-intialized.
+
+POD is a stricter aggregrate
+* It should not have destructor/assign-oper
+* It should be built by PODs only. No non-POD non-static members
+
+Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should still work
 
 ## Links
 
@@ -550,6 +578,7 @@ Operators
                           this name is referring.
 
 # CPP Std Lib Book (Packt Pub)
+Rainer Grimm (Purchased)
 
 ## Ch2: The standard library
 
@@ -598,6 +627,92 @@ Operators
 ## Ch3: Utility Functions
 
 * min, max, minmax
+
+# Modern C++ Programming Cookbook
+Marius Bancila (Packt Pub) (Safari Online)
+
+## Ch1: Learning Modern Core Language Features
+
+### Using auto whenever possible
+
+
+* auto name = expression
+    ```
+     auto i = 42;          // int 
+     d = 42.5;             // double 
+     auto s = "text";      // char const * 
+     auto v = { 1, 2, 3 }; // std::initializer_list<int> 
+                           // Notice its initializer_list and not vector
+    ```
+* auto name = type-id { expression }
+    * This form is like type-changing the literal to someothing
+      other than what the literal/expr will get assigned to
+    ```
+    auto b  = new char[10]{ 0 };            // char* 
+    auto s1 = std::string {"text"};         // std::string
+    auto v1 = std::vector<int> { 1, 2, 3 }; // std::vector<int>
+    auto p  = std::make_shared<int>(42);    // std::shared_ptr<int>
+    ```
+* auto name = lambda-expression
+* declare lambda parameters
+* declare fn return type
+
+* Benefits of Using auto
+    * cant leave a variable uninitialized
+    * no implicit conv like `int a=sizeof(..);` type implicit conv
+    * less typing for things like iterator
+    * consistent coding style.. type is always on right side.
+* Gotchas
+    * const/volatile is not specified by auto
+    * reference type is not specified by auto
+    * can't use auto for non-moveable types
+    * not for multi-word types (long long, struct foo)
+
+### Creating type aliases and alias templates
+
+* typedef cannot be use for template typedef'ing
+* using identifier = type-id
+    ```
+    using byte    = unsigned char;
+    using pbyte   = unsigned char *;
+    using array_t = int[10];
+    using fn      = void(byte, double);
+    ```
+* template:
+    ```
+    template <class T> 
+    class custom_allocator { /* ... */}; 
+
+    template <typename T> 
+    using vec_t = std::vector<T, custom_allocator<T>>; 
+
+    vec_t<int>           vi; 
+    vec_t<std::string>   vs; 
+    ```
+* Dont mix typedef and using
+
+### Understanding uniform initialization
+
+* Brace-initialization is a uniform method for initializing data in C++11. For
+  this reason, it is also called uniform initialization
+* 2 types of initialization in C++
+    ```
+    T object {other};   // direct list initialization 
+    T object = {other}; // copy list initialization
+    ```
+    * uniform initialization works for both
+* Be it:)b
+    * standard containers
+    * dynamically allocated arrays
+    * statically definied arrays
+    * built-in types
+    * user-defined types
+    * user-defined POD types
+* Previously we could initialize by
+    * direct assignment for built-in types
+    * conversion constructor (that takes in one arg of a said type)
+    *
+
 
 # Questions to check
 

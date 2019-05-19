@@ -274,6 +274,26 @@ Solution
   formed when adding a edge.
   (We can use DFS to detect the cycle).
 
+# Lockless allocator
+
+Basically its a fixed size mem-pool. But there aren't locks to alloc/free memory.
+
+* The free/taken objects are tracked by bits. For ex, a 64-bit WORD represents the taken/free status of 64 blocks.
+* When an alloc-is issued from thread-x, this walk over the bit-array. It does a atomic::exchange of 0 on a word.
+  And then checks whether any 1 bit is available in this word. If so, it takes that location, clears the bit,
+  and then does a atmoic::OR of the 1-bit cleared word back. If this word has no free bits, it moves on to the next word.
+* When a free is issued from thread-y, this does a atomic:OR on the bit its free'ing.
+
+Flip-sides:
+
+* Each thread holds one entire 32/64-block - depending on the atomicity of the underlying word. If all free blocks are
+  only on the last word, then a thread declares no more memory although there is.
+* Each thread iterates the entire bit-field before finding out next free, instead of walking over a simple free list
+  under a guard(!)
+
+# Single-Producer/Single-Consumer Bit flag
+
+
 # Call-Order
 
 Assume a signleton class. It has 3 methods. first(), second(), third(). How do u ensure,

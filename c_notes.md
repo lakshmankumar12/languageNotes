@@ -176,4 +176,13 @@ Also note that signed int overflow is UNDEFINED. Unsigned overflow follows modul
 Last read FAQ: 3.7
 ```
 
+# Malloc
 
+Good links:
+
+* http://g.oswego.edu/dl/html/malloc.html
+* https://sourceware.org/glibc/wiki/MallocInternals
+* https://danluu.com/malloc-tutorial/
+* https://manybutfinite.com/post/anatomy-of-a-program-in-memory/
+
+* http://www.cs.cmu.edu/afs/cs/academic/class/15213-s03/src/interposition/mymalloc.c

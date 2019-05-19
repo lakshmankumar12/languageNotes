@@ -52,6 +52,8 @@ echo &number
 
 ```vim
 line(".") "Get the current line number
+
+let a:lineContents=getline(1) "Get first line in a var
 ```
 
 ## External command output
