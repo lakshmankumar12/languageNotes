@@ -154,7 +154,10 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
    https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular
 * Lockless, multi-producer, multi-consumer
    http://www.linuxjournal.com/content/lock-free-multi-producer-multi-consumer-queue-ring-buffer?page=0,2
-
+* On rvalue references
+   http://thbecker.net/articles/rvalue_references/section_01.html
+* On auto/decltype
+   http://thbecker.net/articles/auto_and_decltype/section_01.html
 
 ## On the roll
 
@@ -710,8 +713,93 @@ Marius Bancila (Packt Pub) (Safari Online)
     * user-defined POD types
 * Previously we could initialize by
     * direct assignment for built-in types
-    * conversion constructor (that takes in one arg of a said type)
-    *
+    * conversion constructor (that takes in one arg of a said type) via assignment.
+    * plain initialization without args(def-constructor)
+    * explicit constructor arg passing initialization
+        * note that a non-zero arg initialization by parenthesis isn't possible.
+          Its a fn-declaration.
+          ```
+            foo f1;           // default initialization 
+            foo f2(42, 1.2);
+            foo f3(42); 
+            foo f4();         // function declaration
+          ```
+    * Aggregates could be initiazlied by brace-initialization
+* Initialization of standard containers, such as the vector and the map also
+  shown above, is possible because all standard containers have an additional
+  constructor in C++11 that takes an argument of type std::initializer_list<T>
+* The way the initialization using std::initializer_list works is the following:
+    * The compiler resolves the types of the elements in the initialization list (all elements must have the same type).
+    * The compiler creates an array with the elements in the initializer list.
+    * The compiler creates an std::initializer_list<T> object to wrap the previously created array.
+    * The std::initializer_list<T> object is passed as an argument to the constructor.
+* An initializer list always takes precedence over other constructors where brace-initialization is used
+  This gets precedence over other constructors
+
+### Understanding the various forms of non-static member initialization
+
+Use initializer list. You sometimes can't do it when:
+* you want use this. Some comipers warn that this is uninitizlied at this point
+* you want to refer another member from one member
+* test an input, throw an exception and initiazlize after the test
+
+Starting with C++11, non-static data members can be initialized when declared
+in the class. This is called default member initialization because it is
+supposed to represent initialization with default values. Default member
+initialization is intended for constants and for members that are not
+initialized based on constructor parameters
+
+* Use default member initialization for providing default values for members of
+  classes with multiple constructors that would use a common initializer for
+  those members
+* Use default member initialization for constants, both static and non-static
+* Use the constructor initializer list to initialize members that don't have
+  default values, but depend on constructor parameters
+* Use assignment in constructors when the other options are not possible
+  (examples include initializing data members with pointer this, checking
+  constructor parameter values, and throwing exceptions prior to initializing
+  members with those values or self-references of two non-static data members).
+
+### Controlling and querying object alignment
+
+2 keywords: alignas alignof
+
+* To control the alignment of a type (both at the class level or data member
+  level) or an object, use the alignas specifier:
+    ```
+    struct alignas(4) foo 
+    { 
+      char a; 
+      char b; 
+    }; 
+    struct bar 
+    { 
+      alignas(2) char a; 
+      alignas(8) int  b; 
+    }; 
+    alignas(8)   int a; 
+    alignas(256) long b[4];
+    ```
+* To query the alignment of a type, use the alignof operator:
+    ```
+    auto align = alignof(foo);
+    ```
+
+### Using scoped enumerations
+
+* Old style enums are called unscoped.
+* new, called scoped enumerations: enum class, enum struct
+    * Both are the same.
+* what they solve:
+    * enumtype1::value1 should be used. Simply doing value1 isn't possible. So, 2 enums can have same value1
+    * enums dont implicitly convert to int
+    * You can forward-declare enums
+      ```
+      enum class Codes : unsigned int;
+      ```
+
+
+
 
 
 # Questions to check
