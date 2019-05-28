@@ -232,7 +232,7 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
 #### Item 12: Initialize all parts of a class
 * Ensure to initialize/copy/assign all members of the class
 * Ensure to call the right copy/assingment operators of all base classes
-* Dont implement one constructor/assignment operator with another. Have a 3rd function and calls this from all 
+* Dont implement one constructor/assignment operator with another. Have a 3rd function and calls this from all
              constructors and assignment operators
 
 ### Resource Management
@@ -328,7 +328,7 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
 
 #### Item 28:  Avoid returning handles to object internals.
 * It opens up encapsulation.
-* Note the example, where a const member function returns a 
+* Note the example, where a const member function returns a
   non-const data (as data is not immediately in this object,
   but is pointed to from the object)
 * Note the example, where a reference to object is dead, as
@@ -339,7 +339,7 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
 #### Item 29:  Strive for exception safe code
 * nothrow (doesn't throw anything) is a non-compiler controlled
   guarantee
-  throw() -- means, if the fuction throws sth, its a serious 
+  throw() -- means, if the fuction throws sth, its a serious
   error (like assert) and the unexpected() will be called.
 * basic guarantee -- program is in some valid state after the
                      exception is thrown
@@ -420,7 +420,7 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
 * Composition is either "has-a" (application domain) or "is-implemented-in-term-of" (impl. domain)
 
 #### Item 39:  Private inheritance
-* Rules: 
+* Rules:
     * derived ref/ptr wont become base ref/ptr
     * public/prot members of base will be priv of derived.
 * Private inheritance means is-implemented-in-terms of. It’s usually
@@ -509,7 +509,7 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
 #### Item 4: Avoid gratuitous default constructors if that doesn't make sense.
 * However, u cannot do the following if you dont have default constructor
     * Create arrays of the type
-        * This can be overcome with allocating the 
+        * This can be overcome with allocating the
     * Perhaps not place this in container classes. (however std::vector doesn't
       have that limitation)
     * Another problem is these can't be virtual base classes.
@@ -534,8 +534,8 @@ Operators
   increment activity is the same
 
 #### Item 7:  Never overload &&, || and comma operators
-* expr1 && expr2 becomes expr1.operator&&(expr2) for member fn or 
-    operator&&(expr1, expr2) for global. 
+* expr1 && expr2 becomes expr1.operator&&(expr2) for member fn or
+    operator&&(expr1, expr2) for global.
     *  This doesn't offer short-circuit - beware!!
 
 #### Item 8:  Understand the different meanings of new and delete
@@ -641,17 +641,17 @@ Marius Bancila (Packt Pub) (Safari Online)
 
 * auto name = expression
     ```
-     auto i = 42;          // int 
-     d = 42.5;             // double 
-     auto s = "text";      // char const * 
-     auto v = { 1, 2, 3 }; // std::initializer_list<int> 
+     auto i = 42;          // int
+     d = 42.5;             // double
+     auto s = "text";      // char const *
+     auto v = { 1, 2, 3 }; // std::initializer_list<int>
                            // Notice its initializer_list and not vector
     ```
 * auto name = type-id { expression }
     * This form is like type-changing the literal to someothing
       other than what the literal/expr will get assigned to
     ```
-    auto b  = new char[10]{ 0 };            // char* 
+    auto b  = new char[10]{ 0 };            // char*
     auto s1 = std::string {"text"};         // std::string
     auto v1 = std::vector<int> { 1, 2, 3 }; // std::vector<int>
     auto p  = std::make_shared<int>(42);    // std::shared_ptr<int>
@@ -683,14 +683,14 @@ Marius Bancila (Packt Pub) (Safari Online)
     ```
 * template:
     ```
-    template <class T> 
-    class custom_allocator { /* ... */}; 
+    template <class T>
+    class custom_allocator { /* ... */};
 
-    template <typename T> 
-    using vec_t = std::vector<T, custom_allocator<T>>; 
+    template <typename T>
+    using vec_t = std::vector<T, custom_allocator<T>>;
 
-    vec_t<int>           vi; 
-    vec_t<std::string>   vs; 
+    vec_t<int>           vi;
+    vec_t<std::string>   vs;
     ```
 * Dont mix typedef and using
 
@@ -700,7 +700,7 @@ Marius Bancila (Packt Pub) (Safari Online)
   this reason, it is also called uniform initialization
 * 2 types of initialization in C++
     ```
-    T object {other};   // direct list initialization 
+    T object {other};   // direct list initialization
     T object = {other}; // copy list initialization
     ```
     * uniform initialization works for both
@@ -719,9 +719,9 @@ Marius Bancila (Packt Pub) (Safari Online)
         * note that a non-zero arg initialization by parenthesis isn't possible.
           Its a fn-declaration.
           ```
-            foo f1;           // default initialization 
+            foo f1;           // default initialization
             foo f2(42, 1.2);
-            foo f3(42); 
+            foo f3(42);
             foo f4();         // function declaration
           ```
     * Aggregates could be initiazlied by brace-initialization
@@ -767,17 +767,17 @@ initialized based on constructor parameters
 * To control the alignment of a type (both at the class level or data member
   level) or an object, use the alignas specifier:
     ```
-    struct alignas(4) foo 
-    { 
-      char a; 
-      char b; 
-    }; 
-    struct bar 
-    { 
-      alignas(2) char a; 
-      alignas(8) int  b; 
-    }; 
-    alignas(8)   int a; 
+    struct alignas(4) foo
+    {
+      char a;
+      char b;
+    };
+    struct bar
+    {
+      alignas(2) char a;
+      alignas(8) int  b;
+    };
+    alignas(8)   int a;
     alignas(256) long b[4];
     ```
 * To query the alignment of a type, use the alignof operator:
@@ -796,7 +796,31 @@ initialized based on constructor parameters
     * You can forward-declare enums
       ```
       enum class Codes : unsigned int;
+      void print_code(Codes const code) {} /* works! without knowing what all are under the enum */
       ```
+### Using override and final for virtual methods
+
+* Always use the virtual keyword when declaring virtual functions in derived
+  classes that are supposed to override virtual functions from a base class,
+* Always use the override special identifier after the declarator part of a
+  virtual function declaration or definition
+    * It shows the reader of the code that "this is a virtual method, that is
+      overriding a virtual method of the base class0
+    * The compiler also knows that it's an override, so it can "check" that you
+      are not altering/adding new methods that you think are overrides:
+* To ensure that functions cannot be overridden further or classes cannot be
+  derived any more, use the final special identifier
+    ```
+    class Derived2 : public Derived1
+    {
+        virtual void foo() final {}
+    };
+    class Derived4 final : public Derived1
+    {
+        virtual void foo() override {}
+    };
+    ```
+
 
 
 
