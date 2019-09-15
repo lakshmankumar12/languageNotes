@@ -33,6 +33,12 @@ lea (%ecx,%eax,8), %edx
 
  => multiply eax by 8 and add to ecx. Put this address in edx
 
+   lea/shl combine is sometimes abused to do constant arithmetic. Here is one snippet that multiplies rax by 384.
+       lea    (%rax,%rax,2),%rdx      ; 3*rax to rdx
+       mov    %rdx,%rax               ; rdx back to rax
+       shl    $0x7,%rax               ; 128*3*orig_rax
+
+
 cmp %eax, %ebx
 
  => if ebx < eax, when performing unsigned comparision, then set carry
@@ -41,7 +47,7 @@ cmp %eax, %ebx
 
 test   %eax,%eax
 
- => check if eax is 0, and if 0 sets ZF. MOst likely followed with je (was 0) or jne (wasn't 0)
+ => check if eax is 0, and if 0 sets ZF. Most likely followed with je (was 0) or jne (wasn't 0)
 
 xor %edi, %edi
 

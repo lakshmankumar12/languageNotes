@@ -62,12 +62,12 @@ if (do_signal) {
 ## consumer:
 
 ```c
-Pthread_mutex_lock(&nready.mutex);
-while (nready.nready == 0)                            /* while(ready-var) helps in preventing spurious wake up calls
-  Pthread_cond_wait(&nready.cond, &nready.mutex);     /* Note: wait releases the mutex. So always call wait within mutex.
+pthread_mutex_lock(&nready.mutex);
+while (nready.nready == 0)                            /* while(ready-var) helps in preventing spurious wake up calls */
+  pthread_cond_wait(&nready.cond, &nready.mutex);     /* Note: wait releases the mutex. So always call wait within mutex.
                                                          And wait will re-acquire mutex when it returns */
 nready.nready--;
-Pthread_mutex_unlock(&nready.mutex);
+pthread_mutex_unlock(&nready.mutex);
 ```
 
 # read-write-locks
