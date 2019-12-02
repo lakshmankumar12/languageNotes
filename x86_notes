@@ -79,6 +79,9 @@ sal %cl, %edx
   => sh* doesn't extend sign bit. sar does. sal/shl are exactly the same.
   => shl/sal puts the last lost bit in carry flag
 
+cmov %eax, %ebx
+    => conditional move. Its same as test ... and then je , then %eax,%ebx (the stuff). THe cmov avoid the brand prediction penalty for a simple one step instruction.
+
 
 Jumps reference - http://www.unixwiz.net/techtips/x86-jumps.html
 -----

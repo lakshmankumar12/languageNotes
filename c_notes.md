@@ -54,6 +54,20 @@ char *p  = "string literal";
     ```
     Will make p a `char *const p` and not `const char *p+`. This is desirable.
 
+## Array
+
+* when you feel like indicating the index as part of initialization, you can use array-designators.
+  Eg:
+  ```c
+    enum { RED, GREEN, BLUE };
+    const char *nm[] = {
+        [RED]   = "red",
+        [GREEN] = "green",
+        [BLUE]  = "blue",
+                  NULL
+    };
+  ```
+
 ## Namespaces
 
 * Detailed in this http://c-faq.com/decl/namespace.html[Faq 1.29]
@@ -162,6 +176,20 @@ Also note that signed int overflow is UNDEFINED. Unsigned overflow follows modul
 
 * Argument -E in gcc stops at preprocessing stage
 * Argument -dM in processing stage dumps all macro definitions used.
+
+## preprocessor output study
+
+https://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
+
+* linemarkers
+    ```
+    # linenum filename flags
+    ```
+* flags:
+    * 1: start of new file
+    * 2: returning to file (after end of a included file)
+    * 3: contents from sys header file
+    * 4: implicit extern C block
 
 # Some other library functions
 
