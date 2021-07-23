@@ -206,6 +206,16 @@ v.front()        /* get value of front element  -- undefined behavior on empty c
 v.back()         /* get value of last element -- undefined behavior on empty containers  */
 ```
 
+## on new
+
+```c
+void * p = ::operator new(5); // allocate only!
+T * q = new (p) T();          // construct
+q->~T();                      // deconstruct: YOUR responsibility
+// delete (p) q;   <-- does not exist!! It would invoke the following line:
+::operator delete(p, q);      // does nothing!
+::operator delete(q);         // deallocate
+```
 
 # char stuff
 

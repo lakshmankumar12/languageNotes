@@ -44,6 +44,11 @@ normal, ^super^, ~sub~
 comment block
 ////
 
+
+code-block
+
+search: monospace, plaintext
+
 put ur src text in like this (src-highlighting for asciidoctor given below)
 
 .title

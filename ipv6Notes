@@ -221,6 +221,11 @@ Router Solicitation:     A host sends a Router Solicitation multicast p
 Router Advertisement:    When a router receives a Router Solicitation message, it responses back
                          to the host advertising its presence on that link.
 
+                         There are 3 options
+                         * SLAAC - no dhcpv6. I'm everything you need (prefix,prefix-length,default-gw)
+                         * SLAAC + stateless dhcpv6 - get dns & stuff from the stateless server
+                         * DHCPv6 - contact dhcpv6 for all your info. I am just the def-gw.
+
 Redirect:                This may be the situation where a Router receives a Router Solicitation 
                          request but it knows that it is not the best gateway for the host. In 
                          this situation, the router sends back a Redirect message telling the 

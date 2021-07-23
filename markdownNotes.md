@@ -34,6 +34,13 @@ Alt-H2
 
 * Strikethrough uses two tildes. ~~Scratch this.~~
 
+---
+**NOTE**
+
+It works with almost all markdown flavours (the below blank line matters).
+
+---
+
 
 ### Code
 

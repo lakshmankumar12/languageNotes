@@ -52,6 +52,8 @@ std::initializer_list<T> lst;
 eg: std::initializer_list<double> lst{2.2,2.3,2.4};
 ```
 
+https://stackoverflow.com/questions/629017/how-does-array100-0-set-the-entire-array-to-0
+
 ### Unique Ptrs
 
 ```
@@ -110,6 +112,8 @@ Object& Object::operator=(const Object &rhs);
 Object& Object::operator=(const DiffTypeObject &rhs);
 ```
 * note non-const reference return and const reference arg.
+    * Only then constructs like  (a=b).nonConstMember() will work.
+    * std::string for eg allows this. (a=b).clear()
 * same for all assignments like +=,-=,*=,/=
 
 ### prefix / postfix
@@ -160,6 +164,40 @@ Basically, a POD can be memcpy'ed back and forth, reinterpret-casted and should 
    http://thbecker.net/articles/auto_and_decltype/section_01.html
 * New features
    https://medium.com/free-code-camp/some-awesome-modern-c-features-that-every-developer-should-know-5e3bf6f79a3c
+
+# Exception
+
+code look:
+```c
+    try {
+        whatever();
+    } catch (derived_exception &e) {
+        cout << e.what() << endl;
+    } catch (base_exception &e) {
+        cout << e.what() << endl;
+    } catch (std::exception &grand_base) {
+        cout << e.what() << endl;
+    }
+```
+
+throw(a,b,c) is called the exception specifier
+    * violation is caught at run-time, not at compile time
+        * I saw that a throw in the same function-scope raised a compile error.
+        * But this is just delusion, as called functions can still throw and that is caught at runtime
+noexcept is the C++11 keyword
+    * it is a compile time thing? [to confirm]
+
+exception specifier is a bad idea - https://stackoverflow.com/a/88905/2587153
+    * Template class is impossible to write
+    * they prohibit extensiblity
+    * if some function called inside throws sth else, it calls terminate()
+        * this dies silently/violently w/o stack-trace
+
+noexcept - offers a binary choice, functions that throw and that that dont
+
+* Note that when catching exceptions, u should catch by reference.
+* When catching exceptions, you should list derived first, followed by base.
+    * Putting base first, will match all derived too.
 
 ## On the roll
 
