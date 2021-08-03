@@ -392,10 +392,10 @@ rdtsc -> a monotic counter from cpu
 clock_gettime
 
 
-memory barrier/compiler memory barrier
 
 rdtsc
 rdtscp
+
 
 ## Read/Write
 
@@ -411,4 +411,7 @@ struct mmsghdr {
 };
 ```
 
+# memory barrier/compiler memory barrier
 
+https://lwn.net/Articles/573436/
+https://preshing.com/20120710/memory-barriers-are-like-source-control-operations/

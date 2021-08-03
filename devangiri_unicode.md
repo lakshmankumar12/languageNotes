@@ -8,7 +8,7 @@ Range   |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  A  |  B  
 U+090x  |     |cbind|anusw|visar|  ऄ  |  अ  |  आ  |  इ  |  ई  |  उ  |  ऊ  |  ऋ  |  ऌ  |  ऍ  |  ऎ  |  ए   ( \xe0\xa4\x80 -- 8f)
 U+091x  |  ऐ  |  ऑ  |  ऒ  |  ओ  |  औ  |  क  |  ख  |  ग  |  घ  |  ङ  |  च  |  छ  |  ज  |  झ  |  ञ  |  ट   ( \xe0\xa4\x90 -- 9f)
 U+092x  |  ठ  |  ड  |  ढ  |  ण  |  त  |  थ  |  द  |  ध  |  न  |  ऩ  |  प  |  फ  |  ब  |  भ  |  म  |  य   ( \xe0\xa4\xa0 -- af)
-U+093x  |  र  |  ऱ  |  ल  |  ळ  |  ऴ  |  व  |  श  |  ष  |  स  |  ह  |     |     |     |  ऽ  | -आ  | -इ   ( \xe0\xa4\xb0 -- bf)
+U+093x  |  र  |  ऱ  |  ल  |  ळ  |  ऴ  |  व  |  श  |  ष  |  स  |  ह  |     |     |nukta|  ऽ  | -आ  | -इ   ( \xe0\xa4\xb0 -- bf)
 U+094x  | -ई  | -उ  | -ऊ  | -ऋ  | -ऌ  |     |     | -ए  | -ऐ  |     |     | -ओ  | -औ  |Half |     |      ( \xe0\xa5\x80 -- 8f)
 U+095x  |  ॐ  |svari|anuda|grave|     |     |     |     |  क़  |  ख़  |  ग़  |  ज़  |  ड़  |  ढ़  |  फ़  |  य़   ( \xe0\xa5\x90 -- 9f)
 U+096x  |  ॠ  |  ॡ  |     |     |  ।  |  ॥  |  ०  |  १  |  २  |  ३  |  ४  |  ५  |  ६  |  ७  |  ८  |  ९   ( \xe0\xa5\xa0 -- af)
@@ -43,6 +43,7 @@ U+0BFx  |  ௰  |  ௱  |  ௲  |  ௳  |  ௴  |  ௵  |  ௶  |  ௷  |  ௸  
 
 Comment      |  Unicode  |  utf-8         |   Actual
              |           |                |
+greek delta  |  U+0394   | \xce\x94       |  Δ
 greek sigma  |  U+03a3   | \xce\xa3       |  Σ
 indian rupee |  U+20b9   | \xe2\x82\xb9   |  ₹
              |           |                |
@@ -52,3 +53,19 @@ indian rupee |  U+20b9   | \xe2\x82\xb9   |  ₹
 Comment               | Unicode | utf-8            | Actual
                       |         |                  |
 slightly smiling face | U+1f642 | \xf0\x9f\x99\x82 | 🙂
+ROTFL                 | U+1f923 | \xf0\x9f\xa4\xa3 | 🤣
+
+## Emojis
+
+Comment                 | Unicode | utf-8            | Actual
+                        |         |                  |
+Thumbs up               | U+1f44d | \xF0\x9F\x91\x8d | 👍
+Clap                    | U+1f44f | \xF0\x9F\x91\x8F | 👏
+Open hands (clap other) | U+1f450 | \xF0\x9F\x91\x90 | 👐
+
+
+# Links
+
+https://en.wikipedia.org/wiki/Unicode_block
+https://en.wikipedia.org/wiki/Miscellaneous_Symbols_and_Pictographs
+https://en.wikipedia.org/wiki/Emoticons_(Unicode_block)
