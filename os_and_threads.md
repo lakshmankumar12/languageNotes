@@ -415,3 +415,10 @@ struct mmsghdr {
 
 https://lwn.net/Articles/573436/
 https://preshing.com/20120710/memory-barriers-are-like-source-control-operations/
+One of the detailed:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/memory-barriers.txt?id=HEAD
+
+# Multiple producer / Single consumer impl
+
+grpc/src/core/lib/gprpp/mpscq.cc
+http://www.1024cores.net/home/lock-free-algorithms/queues/intrusive-mpsc-node-based-queue

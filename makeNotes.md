@@ -56,7 +56,13 @@ pre_req: ;
 
 * Space after var at declaration.
 * Use with dollar-parentheses
+
+## Assignment with equal operator
+
+Search: = :=
+
 * `=` expands the variable everytime, while `:=` expands just once.
+https://www.gnu.org/software/make/manual/html_node/Flavors.html#Flavors
 
 ```
 variable_name = value
@@ -65,6 +71,7 @@ target: $(var_having_prereq)
   recipe_command $(some_var)
 
 ```
+
 
 ## Automatic variables
 
