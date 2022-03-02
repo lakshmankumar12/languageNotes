@@ -293,6 +293,9 @@ Flip-sides:
 
 # Single-Producer/Single-Consumer Bit flag
 
+One implementation at:
+https://github.com/grpc/grpc/blob/master/src/core/lib/gprpp/mpscq.cc
+
 
 # Call-Order
 
