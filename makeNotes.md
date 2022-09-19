@@ -42,6 +42,23 @@ rule for pre_req with a empty recipe.
 pre_req: ;
 ```
 
+### Grouped targets
+
+* Useful when the receipe builds all targets in one-go.
+
+```
+foo bar biz &: baz boz
+    echo $^ > foo
+    echo $^ > bar
+    echo $^ > biz
+
+```
+
+
+## Recipie
+
+* Use `@` in the beginning dif you want suppress echo'ing of the commands
+
 
 # Variables
 
@@ -61,6 +78,7 @@ pre_req: ;
 
 Search: = :=
 
+* There has to be a space on either side of `=` or `:=` symbol
 * `=` expands the variable everytime, while `:=` expands just once.
 https://www.gnu.org/software/make/manual/html_node/Flavors.html#Flavors
 
@@ -186,5 +204,82 @@ target_include_directories(Tutorial PUBLIC
 ```
 #define Tutorial_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
 #define Tutorial_VERSION_MINOR @Tutorial_VERSION_MINOR@
+```
+
+
+# Sample makefile tricks
+
+## Progress bar
+
+* https://stackoverflow.com/a/455390/2587153 [Progress printing]
+
+```
+# PLACE AT THE TOP OF YOUR MAKEFILE
+#---------------------------------
+# Progress bar defs
+#--------------------------------
+#  words = count the number of words
+ifneq ($(words $(MAKECMDGOALS)),1) # if no argument was given to make...
+.DEFAULT_GOAL = all # set the default goal to all
+#  http://www.gnu.org/software/make/manual/make.html
+#  $@ = target name
+#  %: = last resort recipe
+#  --no-print-directory = don't print enter/leave messages for each output grouping
+#  MAKEFILE_LIST = has a list of all the parsed Makefiles that can be found *.mk, Makefile, etc
+#  -n = dry run, just print the recipes
+#  -r = no builtin rules, disables implicit rules
+#  -R = no builtin variables, disables implicit variables
+#  -f = specify the name of the Makefile
+%:                   # define a last resort default rule
+      @$(MAKE) $@ --no-print-directory -rRf $(firstword $(MAKEFILE_LIST)) # recursive make call,
+else
+ifndef ECHO
+#  execute a dry run of make, defining echo beforehand, and count all the instances of "COUNTTHIS"
+T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
+      -nrRf $(firstword $(MAKEFILE_LIST)) \
+      ECHO="COUNTTHIS" | grep -c "COUNTTHIS")
+#  eval = evaluate the text and read the results as makefile commands
+N := x
+#  Recursively expand C for each instance of ECHO to count more x's
+C = $(words $N)$(eval N := x $N)
+#  Multipy the count of x's by 100, and divide by the count of "COUNTTHIS"
+#  Followed by a percent sign
+#  And wrap it all in square brackets
+ECHO = echo -ne "\r [`expr $C '*' 100 / $T`%]"
+endif
+#------------------
+# end progress bar
+#------------------
+
+# REST OF YOUR MAKEFILE HERE
+any_target: whatever_pre_req
+    @$(ECHO) Doing $@
+
+#----- Progressbar endif at end Makefile
+endif
+----
+```
+
+without comment
+
+```
+----
+ifneq ($(words $(MAKECMDGOALS)),1) # if no argument was given to make...
+.DEFAULT_GOAL = all # set the default goal to all
+%:                   # define a last resort default rule
+      @$(MAKE) $@ --no-print-directory -rRf $(firstword $(MAKEFILE_LIST)) # recursive make call, 
+else
+ifndef ECHO
+T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
+      -nrRf $(firstword $(MAKEFILE_LIST)) \
+      ECHO="COUNTTHIS" | grep -c "COUNTTHIS")
+N := x
+C = $(words $N)$(eval N := x $N)
+ECHO = echo -ne "\r [`expr $C '*' 100 / $T`%]"
+endif
+
+# ...
+
+endif
 ```
 
