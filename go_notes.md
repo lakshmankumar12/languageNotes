@@ -496,6 +496,19 @@ Type names from basic-types are referred as named basic types. Eg. time.Duration
   type conversions done from type X to Y (although both types are internally
   same)
 
+### interface to concrete conversion
+
+```go
+// converts interface-i to a concrete type-T.
+// will panic is i is not of type T
+v = i.(T)
+
+// for safe cast
+// ok is true or false.
+v, ok = i.(T)
+```
+
+
 ## type-assertion
 
 Not sure.. To read more on this

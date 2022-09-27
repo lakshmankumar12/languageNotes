@@ -93,9 +93,12 @@ target: $(var_having_prereq)
 
 ## Automatic variables
 
+Full list: https://www.gnu.org/software/make/manual/make.html#Automatic-Variables
+
 `$@` - filename of the target of the rule
 `$<` - first prerequistie
 `$^` - all prerequisties
+`$*` - stem which a implicit rule matched. Basically the `%` part that matched in the rule
 
 ## Special Make variables
 
