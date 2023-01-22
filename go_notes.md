@@ -139,23 +139,6 @@ func name(parameter-list) (result-list) {
 * each function invocation will result in a different local-variable
   pointer.
 
-## Basic Types
-
-```go
-bool  // either true or false
-string
-int  int8  int16  int32  int64
-uint uint8 uint16 uint32 uint64 uintptr
-byte // alias for uint8
-rune // alias for int32
-// represents a Unicode code point
-float32 float64
-complex64 complex128
-```
-
-* Variables w/o Initialization is set to 0/false/empty-string
-* Note, there is only one basic type which is a pointer.
-  This is big enuf to hold any poitner.
 
 # constants
 
@@ -176,15 +159,52 @@ complex64 complex128
     ```
 * nil represents non-existing pointer or reference-type (for slices, interface).
 
+
 ## strings
 
-* always utf-8
-* enclosed in double quotes
+### literals
+
 * single-quote strings represent one utf-8 character
-    * actually this is referred as rune
+    * this is referred as rune
+* double-quote strings are regular strings
+    * supports escape chars, including `\"`
+    * other escape chars:
+        ```
+        \\     | Backslash(\)
+        \000   | Unicode character with the given 3-digit 8-bit octal code point
+        \'     | Single quote ('). It is only allowed inside character literals
+        \"     | Double quote ("). It is only allowed inside interpreted string literals
+        \a     | ASCII bell (BEL)
+        \b     | ASCII backspace (BS)
+        \f     | ASCII formfeed (FF)
+        \n     | ASCII linefeed (LF
+        \r     | ASCII carriage return (CR)
+        \t     | ASCII tab (TAB)
+        \uhhhh | Unicode character with the given 4-digit 16-bit hex code point. Unicode character with the given 8-digit 32-bit hex code point.
+        \v     | ASCII vertical tab (VT)
+        \xhh   | Unicode character with the given 2-digit 8-bit hex code point.
+        ```
+* back-tick quoted
+    * called raw-string literals
+    * can span multiple lines.
+    * No escape chars
+        * Doesn't support another backtick inside
+
+Examples:
+
+```go
+a := "simple usual string"
+b := "string with an escape char\" and another\n"
+c := `raw-string literal
+   that can span multiple lines`
+```
+
+
+### more notes
+
+* always utf-8
 * strings are immutable
 * to edit strings, convert to slice of runes
-* backticks are for raw string literals that span multi-line.
 * string(byteslice) coverts a byte slice to a string
 
 ```go
@@ -199,8 +219,7 @@ fmt.Printf("%s\n", s2)
   also total bytes, not runes. However range on a string works over runes
 * The above isn't usually a problem to iterate over a string comparing it to individual
   runes(Atleast the ascii ones), as the non-ascii ones anyway dont compare equal.
-* Inside a program, you can covert a string(utf-8 encoded) to slice of runes
-
+* Inside a program, you can convert a string(utf-8 encoded) to slice of runes
 
 # Flow control statements
 
@@ -235,6 +254,18 @@ fmt.Printf("%s\n", s2)
     }
     ```
 * Variables declared in for's initialization part have loop's scope
+* iterating over a map
+  ```go
+  for k, v := range m {
+    fmt.Printf("key[%s] value[%s]\n", k, v)
+  }
+  for k := range m {
+    fmt.Printf("only key[%s]\n", k)
+  }
+  for _,v := range m {
+    fmt.Printf("only value[%s]\n", v)
+  }
+  ```
 
 ## if
 
@@ -294,9 +325,27 @@ fmt.Printf("%s\n", s2)
 * Deferred function calls are pushed onto a stack. When a function returns, its
   deferred calls are executed in last-in-first-out order.
 
-## More types
+# Types
 
-# Pointers
+## Basic Types
+
+```go
+bool  // either true or false
+string
+int  int8  int16  int32  int64
+uint uint8 uint16 uint32 uint64 uintptr
+byte // alias for uint8
+rune // alias for int32
+// represents a Unicode code point
+float32 float64
+complex64 complex128
+```
+
+* Variables w/o Initialization is set to 0/false/empty-string
+* Note, there is only one basic type which is a pointer.
+  This is big enuf to hold any poitner.
+
+## Pointers
 
 * Like c, * is used for type. `*T` is a pointer of type T. & is for getting a
   variable's pointer, and `*var` is for deferencing or indirecting. However,
@@ -305,7 +354,7 @@ fmt.Printf("%s\n", s2)
 * Pointers are useful to pass by reference (like a slice that might be
   modified in a function)
 
-# structs
+## structs
 
 * A struct is a collection of fields. Fields are accessed using dot. (dot
   is called selector in go. It selects which field or method to use)
@@ -316,8 +365,9 @@ fmt.Printf("%s\n", s2)
     }
     ```
 * To access the field X of a struct when we have the struct pointer p we could
-  write (*p).X. However, that notation is cumbersome, so the language permits
+  write `(*p).X`. However, that notation is cumbersome, so the language permits
   us instead to write just p.X, without the explicit dereference.
+  * whether u have direct struct var or pointer to struct, u can still use dot
 * Struct literal is much like c
 * Capital letter rules follow for struct too. If the struct type name is
   capitalized, the type is exported. If the individual members are caps, they
@@ -328,7 +378,6 @@ fmt.Printf("%s\n", s2)
     Point{1,2}
     Point{X:1, Y:2}
     ```
-* whether u have direct struct var or pointer to struct, u can still use dot
 * Functions that return struct, can better return struct-pointer. This will
   make function call be a L-value
 * Struct can't have the same struct inside, but have a pointer of itself.
@@ -339,9 +388,13 @@ fmt.Printf("%s\n", s2)
   limited to receiver. We cant pass as args the outer Type, where embedded
   type is expected.
 * Structs can have field-tags. These are any literal string. One eg is the
-  ` `json: "json_field_name"` `
+    ```go
+        type Identity struct {
+            Value isIdentity_Value `protobuf_oneof:"Value"`
+        }
+    ```
 
-## methods
+### methods
 
 * The object on which method is called is referred as receiver
 * We can define methods for any type (basic-types, named-types, slices, maps)
@@ -371,30 +424,45 @@ fmt.Printf("%s\n", s2)
         fmt.Println(primes)
     }
     ```
-* Go's array are values. Think of it as struct with indexed members. Passing
+* Go's array are value-types. Think of it as struct with indexed members. Passing
   arrays to function will pass entire copies. (No decaying of name to pointer)
 * array literals are like [n]type{val1,val2,..}. The n can be (...) in which
   case its auto derived.
+  ```go
+     a := [...]int{28,13,14} // compiler determines a is of type [3]int
+  ```
+* every size is different type. `[5]int` is different from `[3]int`
 * len(array) gives its length
 * (Yet to grasp this fully: Be wary of saying/mentioning arrays in go. May be
   the slice is more appropriate). Note that []T is a slice of T, not array of T,
   but [n]T is an array.
+* multi-dimensional arrays are support
+  ```go
+     a := [3][2]string{
+        {"lion", "tiger"},
+        {"cat", "dog"},
+        {"pigeon", "peacock"}, //this comma is necessary.
+                               //The compiler will complain if you omit this comma
+        }
+  ```
 
 ## slices
 
 * An array has a fixed size. A slice, on the other hand, is a
   dynamically-sized, flexible view into the elements of an array. In practice,
   slices are much more common than arrays.
-* The type []T is a slice with elements of type T.
+* slices are reference-types
+* The type `[]T` is a slice with elements of type T.
 * Slice - ptr, len and cap and has the underlying array. len is the number of
   slice elements, cap is the number of elems in underlying array from the loc
   where ptr is pointing. Always len `<=` cap
 * sequence is a term that can indexible. (its either a slice, array or ptr to
-  array). slice-operator on a sequence produces a slice. This expression creates 
+  array). slice-operator on a sequence produces a slice. This expression creates
   a slice of the first five elements of the sequence a.
     ```go
     a[i:j]  // 0 <= i <= j <= cap(a). resulting slice has j-1 elements
     a[0:5]
+    c := []int{5,6,7}  // creates an array, and returns a slice to that array
     ```
 * A slice does not store any data, it just describes a section of an underlying
   array.  Changing the elements of a slice modifies the corresponding elements
@@ -407,6 +475,8 @@ fmt.Printf("%s\n", s2)
   to access that array
     ```go
     func make([]T, len, cap) []T
+    //Eg:
+    i := make([]int, 5, 5)
     ```
 
 ## map
@@ -419,6 +489,15 @@ fmt.Printf("%s\n", s2)
 * Retrival gives 2 restuls - value, ok
 * Map created with make(map[K] V) or using map literal.
 * We can't get address to a map. However the map is itself a reference type.
+
+```go
+// check if map is empty
+if len(m) == 0 {
+
+}
+
+```
+
 
 ## channel
 
@@ -530,6 +609,10 @@ v, ok = varName.(T)
 ## error
 
 * Is an interface type. nil implies no error.
+* To generate a error:
+  ```go
+  fmt.Errorf("Whatever went wrong:%d", int_arg)
+  ```
 
 # Other Go statements
 
