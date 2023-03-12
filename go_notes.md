@@ -4,12 +4,16 @@
 
 * Every Go program is made up of packages. Programs start running in package main.
 * By convention, the package name is the same as the last element of the import path
+    * This means, typically you put all files of a package in a folder
+* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
+  spread across source-files. Each sourcefile calls out its package as its first line.
+  However, unlike cpp, one source file is fully one package only.
 * imports can be grouped into a parenthesized, "factored" import statement.
   This is preferred over individual imports.
   ```go
   import (
-  "fmt"
-  "math"
+      "fmt"
+      "math"
   )
   import myhttp "mypath/http"
   ```
@@ -17,11 +21,31 @@
   to the package its in.
 * when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
   package in "a/b" would have been named b
-* Function calls can precede function declaraion within the package. Unlike c, there is
+* Function calls can precede function declaration within the package. Unlike c, there is
   no declaration/definition distinction. Its just one place and go calls it declaration.
 * init() is a special no-arg, no-return-type function that can appear any number of times
   in every file, in any package. These are called in declaraion order and are invoked
   before the package is considered initialized.
+  init()s of all packages are called before main()
+* calling out
+  ```go
+  import _ "mypath/http"     // blank identifier
+  ```
+  triggers a intialization of the package even if no references to the package is done.
+  Otherwise compiler will complain of redundant import
+
+## module management
+
+* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
+* you might want to let go know that for now, modules are available locally
+    ```sh
+    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
+    ```
+* this generates the mod file
+    ```sh
+    go mod tidy
+    ```
+* GOROOT/GOPATH will always be searched.
 
 # Functions
 
@@ -53,12 +77,23 @@ func name(parameter-list) (result-list) {
         return
     }
     ```
-* functions associated with types are called methods
+* functions associated with types are called methods. These sport the anchoring
+  type in their declaration like this:
+    ```go
+    func (m *MyType) methodFunc(args int) (result int) {
+    }
+    ```
 * variadic function have ellipsis at the last arg's type.
   This makes the funciton take any number of args of that type.
   Internally its accessible as a slice of that type.
 * `...interface{}` makes the funciton take any type of arg any
   number of times.
+
+## closures
+
+* go supports closures
+* Dont pass loop-vars to a function over a closure.
+* basically the closure gets a reference to the variables
 
 ## go builtin functions
 
@@ -79,6 +114,12 @@ func name(parameter-list) (result-list) {
       name. (Different from c/cpp in this regard. In go, every variable
       is like from heap (compiler chooses stack/heap depending on how
       its used)
+    * To confirm:
+        ```go
+        a := new(MyType)
+        //is same as
+        a := &MyType{}
+        ```
 * append
     * adds an element to a slice. If slice has capacity, its very fast.
       If slice capacity doesn't fit, it creates a new array, copies
@@ -94,6 +135,7 @@ func name(parameter-list) (result-list) {
     * Returns number of elements actually copied - the smaller of the 2 slices. So its safe againt
       unavailable sizes too
 * close
+    * close a channel
 * delete
     * used to delete a key in a map
 * complex
@@ -130,6 +172,9 @@ func name(parameter-list) (result-list) {
     ```go
     i , j = j , i  // swap i and j
     ```
+* Always have default values
+    * 0 for numeric types, False for bool, nil for pointers.
+    * Composite type anyway build on the simple types above.
 
 ## scope
 
@@ -213,6 +258,10 @@ c := []rune(s)             /* covert to slice of runes */
 c[0] = 'c'                 /* modify */
 s2 := string(c)            /* covert slice of runes to string */
 fmt.Printf("%s\n", s2)
+
+// checking empty string -- both are okay
+if s != "" { ... }
+if len(s) > 0 { ... }
 ```
 
 * Watch out, string indexing doesn't give the rune, but the byte! In fact len(str) is
@@ -254,6 +303,13 @@ fmt.Printf("%s\n", s2)
     }
     ```
 * Variables declared in for's initialization part have loop's scope
+* iterating over a slice/array (note string iteration will give runes)
+  ```go
+    var a := { 1,2,3}
+    for i,v := range a {
+      fmt.Println("%d %d",i,v)
+    }
+  ```
 * iterating over a map
   ```go
   for k, v := range m {
@@ -264,6 +320,12 @@ fmt.Printf("%s\n", s2)
   }
   for _,v := range m {
     fmt.Printf("only value[%s]\n", v)
+  }
+  ```
+* iterate over a channel
+  ```go
+  for val_copy := range channel_var {
+
   }
   ```
 
@@ -486,7 +548,6 @@ complex64 complex128
   for for integer, boolean, string, rune. Not == is bad for float(Nan). (Complex?)
   If a struct is absolutely just made of the above (to any depth) that is good
   for equivality too.
-* Retrival gives 2 restuls - value, ok
 * Map created with make(map[K] V) or using map literal.
 * We can't get address to a map. However the map is itself a reference type.
 
@@ -495,6 +556,11 @@ complex64 complex128
 if len(m) == 0 {
 
 }
+
+// lookup:
+// value will be the 0-type if the keyval does't exist
+// exists is a boolean.
+value, exists : map_var[keyval]
 
 ```
 
@@ -528,7 +594,7 @@ if len(m) == 0 {
     anim := gif.GIF{LoopCount: nframes}
     ```
 
-## Reference types
+## reference types
 
 * maps, channels, slices, pointers, functions are reference-types. When you pass
   these in functions, you pass a reference to them. So, there are multiple references
@@ -676,7 +742,21 @@ Format specifier in go is called a verb. THe one between % and verb is an adverb
 
 ## log
 
-log.Fatalf - printf and then exit
+```go
+// Change the device for logging to stdout.
+log.SetOutput(os.Stdout)
+
+// regular log
+log.Printf("fmt", values)
+log.Println - 
+
+// printf and then exit
+log.Fatalf("fmt", exit)
+log.Fatal(stringvarorliteral)
+
+
+```
+
 
 ## strings
 
@@ -710,15 +790,15 @@ log.Fatalf - printf and then exit
 * ReadFile
     * Given a filename returns byte slice/err of file contents
 
-# io
+## io
 
 * Discard - sth like /dev/null sink
 
-# net/http
+## net/http
 
 * http.Get(url) resp,err
 
-# time
+## time
 
 * time.Now()
 * Time - details unexported type for Time
@@ -726,19 +806,35 @@ log.Fatalf - printf and then exit
 * time.Sleep(d Duration)
 * time.Afterfunc() - invoke a function after some time in its own go-routine!
 
-# sync
+## sync
 
-* sync.Mutex - mutex TYPE
+```go
+// Setup a wait group so we sync all go-routings
+var waitGroup sync.WaitGroup
 
-# sort
+// Set the number of goroutines we need to wait
+waitGroup.Add(len(go_routines_created))
+
+// mutex type
+sync.Mutex
+```
+
+
+## sort
 
 * sort.Interface
     * Needs Len, Less, Swap
 * sort.Reverse
 
-# regex
+## regex
 
-# json
+## json
+
+```go
+import 'encoding/json'
+
+```
+
 
 * json.Marshall
 * json.MarshallIndent
