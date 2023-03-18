@@ -454,7 +454,14 @@ complex64 complex128
         type Identity struct {
             Value isIdentity_Value `protobuf_oneof:"Value"`
         }
+        type Feed struct {
+            Name string `json:"site"`
+            URI  string `json:"link"`
+            Type string `json:"type"`
+        }
     ```
+* empty structs are allowed. They take 0 bytes. Typically used to define types
+  with methods on them (to fit into a interface) and offer default functionality
 
 ### methods
 
@@ -462,6 +469,12 @@ complex64 complex128
 * We can define methods for any type (basic-types, named-types, slices, maps)
   We can't however define methods for pointers and interfaces. (Pointer methods
   are treated as methods of the pointed-type itself)
+  * if u have a pointer/actual variable, the compiler will automatically choose
+    the right way to pass to receiver
+  * Methods declared with pointer receivers can only be called by
+    interface type values that contain pointers.
+  * Methods declared with value receivers can be called by interface type values
+    that contain both values and pointers.
 * methods can be defined only in the same package where the type is defined.
 * by convention either declare all methods on type or on pointer. Only pointer
   methods can change the receiver though.
@@ -583,6 +596,7 @@ value, exists : map_var[keyval]
   is nil. Such interfaces dont compare to nil.
 * interfaces are comparable (==) if the underlying type is comparable or if both are nil.
   Otherwise, comparing uncomparable types causes runtime panic. (So this is not caught at compile time)
+* convention - if there is only method, the interface name typicall ends in er. Eg: Matcher
 
 # More on types
 
@@ -712,8 +726,16 @@ for i,v := range a {
 
 * os.Args[] - slice of cmd line args. os.Args[0] is the command itself.
 * os.Stdin  - a io.Reader for stdin
-* os.Open   - opens a file! Check the err first and then use the File*
 * os.Exit(1) - exit with a error code.
+
+```go
+// open a file. file of type *File
+file, err := os.Open(dataFile)
+if err != nil {
+    return nil, err
+}
+```
+
 
 ## fmt
 
