@@ -5,6 +5,7 @@
 * Every Go program is made up of packages. Programs start running in package main.
 * By convention, the package name is the same as the last element of the import path
     * This means, typically you put all files of a package in a folder
+    * All files in a folder must have the same package name
 * package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
   spread across source-files. Each sourcefile calls out its package as its first line.
   However, unlike cpp, one source file is fully one package only.
@@ -46,6 +47,8 @@
     go mod tidy
     ```
 * GOROOT/GOPATH will always be searched.
+    * GOPATH can have multiple values like PATH
+    * GOPATH/src is where source code lives.
 
 # Functions
 
@@ -505,9 +508,22 @@ complex64 complex128
   case its auto derived.
   ```go
      a := [...]int{28,13,14} // compiler determines a is of type [3]int
+     // initialize specific indices with values
+     a := [5]int{1:10, 3:30}
+     b := [4]*int{ 2:new(int) }
   ```
 * every size is different type. `[5]int` is different from `[3]int`
 * len(array) gives its length
+* Array copy works as long as both are of same types
+  ```go
+    // Declare a string array of five elements.
+    var array1 [5]string
+    // Declare a second string array of five elements.
+    // Initialize the array with colors.
+    array2 := [5]string{"Red", "Blue", "Green", "Yellow", "Pink"}
+    // Copy the values from array2 into array1.
+    array1 = array2
+  ```
 * (Yet to grasp this fully: Be wary of saying/mentioning arrays in go. May be
   the slice is more appropriate). Note that []T is a slice of T, not array of T,
   but [n]T is an array.
@@ -544,6 +560,16 @@ complex64 complex128
   of its underlying array.  Other slices that share the same underlying array
   will see those changes.
 * slice with no underlying array is nil. This is the zero value for a slice
+    * there is also a slice with empty capacity
+    ```go
+    // nil slice
+    var slice []int
+
+    // Use make to create an empty slice of integers.
+    slice := make([]int, 0)
+    // Use a slice literal to create an empty slice of integers.
+    slice := []int{}
+    ```
 * Can be created with a built-in function - make. Note the odditity. The first
   args is a type-name (and not a var-name). This creates a unnamed array and
   then returns a slice to that array. The returned slice is the only way
@@ -553,6 +579,27 @@ complex64 complex128
     //Eg:
     i := make([]int, 5, 5)
     ```
+* new slice from existing slice
+    ```go
+    // Create a slice of integers.
+    // Contains a length and capacity of 5 elements.
+    slice := []int{10, 20, 30, 40, 50}
+    // Create a new slice.
+    // Contains a length of 2 and capacity of 4 elements.
+    newSlice := slice[1:3]
+    ```
+* append adds to a slice and returns a new slice. NOTE : it DOESNT modify source slice
+  variable. So copy it back as return value to update the variable
+  ```go
+  slice = append(slice, 10)
+  // if s1 and s2 are themselves slices
+  slice = append(slice, s1, s2...)
+  ```
+  * append() may add to the underlying array if there is capacity or it might
+    create a new array and copy all elements
+  * at any rate, the capacity of the slice is increased by 1.
+* Use the capability when creating a new slice from existing slice/array.
+  Making this same as length, forces the next append to allocate a new array
 
 ## map
 
@@ -866,14 +913,40 @@ import 'encoding/json'
 
 ```sh
 go build         # creates a exe in same dir.
+go build -o /path/to/exec file.go
 go run file.go   # Just run as a script
 go install       # build, but put exe in $GOPATH/bin
 
 go test path1/path2/a.go   # Not sure. check
 
-go fmt          # formats a file
 go get abc.com/repo_name/path/file.go  # pulls that file (repo) in $GOPATH/src
+
+# cleans executables
+go clean file.go
+
+# will create a go.mod that list all deps of this package
+go mod init path/from/gopath/src/to/this/package
+
+go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
+
+go vet file.go
+go fmt file.go  # formats a file
+
 ```
+
+# documentation
+
+* comments above any of packages, function, types and global vars
+
+```go
+// Retrieve connects to the configuration repository and gathers
+// various connection settings, usernames, passwords. It returns a
+// config struct on success, or an error.
+func Retrieve() (config, error) {
+// ... omitted
+}
+```
+
 
 # vim
 
@@ -909,5 +982,7 @@ Plugin 'fatih/vim-go'
 # Read later
 
 * https://blog.golang.org/defer-panic-and-recover[Defer-panic-and-recover]
+
+* go in action  ch: 4.2
 
 
