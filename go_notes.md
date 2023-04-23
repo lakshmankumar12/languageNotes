@@ -547,6 +547,8 @@ complex64 complex128
 * Slice - ptr, len and cap and has the underlying array. len is the number of
   slice elements, cap is the number of elems in underlying array from the loc
   where ptr is pointing. Always len `<=` cap
+  * there are function `len()`, `cap()` that give the len and cap of slices
+    * Also for arrays and channels
 * sequence is a term that can indexible. (its either a slice, array or ptr to
   array). slice-operator on a sequence produces a slice. This expression creates
   a slice of the first five elements of the sequence a.
@@ -600,6 +602,8 @@ complex64 complex128
   * at any rate, the capacity of the slice is increased by 1.
 * Use the capability when creating a new slice from existing slice/array.
   Making this same as length, forces the next append to allocate a new array
+* `range` on a slice gives a copy of the element. So dont take pointers while
+  iterating over slices
 
 ## map
 
@@ -869,11 +873,23 @@ log.Fatal(stringvarorliteral)
 
 ## time
 
-* time.Now()
-* Time - details unexported type for Time
-* Duration - nano-sec between 2 instances (upto 290 years)
+```go
+// datattype
+time.Time      // hold a wall-clock time akin to datetime.datetime of python
+time.Duration  // delta between 2 Time s. akine to datetime.timedelta of python
+               // tracks in ns. Can diff upto 290 years.
+
+var t time.Time = time.now()      // gives the current time
+d := time.Until(t)                // gives the duration from now till t
+var h int = math.Floor(d.Hours()) // converts the duration to hours
+
+
+time.Afterfunc() // invoke a function after some time in its own go-routine!
+
+```
+
+
 * time.Sleep(d Duration)
-* time.Afterfunc() - invoke a function after some time in its own go-routine!
 
 ## sync
 
