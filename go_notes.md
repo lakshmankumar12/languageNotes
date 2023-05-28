@@ -624,7 +624,9 @@ if len(m) == 0 {
 // lookup:
 // value will be the 0-type if the keyval does't exist
 // exists is a boolean.
-value, exists : map_var[keyval]
+if value, exists := map_var[keyval] ; exists {
+
+}
 
 ```
 
@@ -709,6 +711,9 @@ Type names from basic-types are referred as named basic types. Eg. time.Duration
 ### interface to concrete conversion
 
 ```go
+//native type are cast like in c
+aUint64Int = uint64(aInt64Var)
+
 // converts interface-i to a concrete type-T.
 // will panic is i is not of type T
 v = i.(T)
@@ -886,7 +891,28 @@ var h int = math.Floor(d.Hours()) // converts the duration to hours
 
 time.Afterfunc() // invoke a function after some time in its own go-routine!
 
-```
+// time from epoch
+// the 64 is to tell give a int64
+i, err := strconv.ParseInt("1405544146", 10, 64)
+if err != nil {
+    panic(err)
+}
+tm := time.Unix(i, 0)
+fmt.Println(tm)
+
+// Run a forever loop in go
+go PeriodicallyReportGatewayStatus(time.Second*60)
+
+func PeriodicallyReportGatewayStatus(dur time.Duration) {
+    for range time.Tick(dur) {           // «««--- is the forever syntax
+        err := reportGatewayStatus()
+        if err != nil {
+            glog.Errorf("err in reportGatewayStatus: %v\n", err)
+        }
+    }
+}
+
+``
 
 
 * time.Sleep(d Duration)
