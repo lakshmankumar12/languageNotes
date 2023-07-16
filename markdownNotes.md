@@ -173,6 +173,16 @@ Markdown | Less | Pretty
 *Still* | `renders` | **nicely**
 1 | 2 | 3
 
+# text blocks
+
+---
+**NOTE**
+
+Should render in most markdown flavors
+
+---
+
+
 # Rules
 
 3 or more hyphens/asteriks/underscore

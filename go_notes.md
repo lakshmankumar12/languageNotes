@@ -187,6 +187,13 @@ func name(parameter-list) (result-list) {
 * each function invocation will result in a different local-variable
   pointer.
 
+# operators
+
+```
+&^  -- (golang special) x &^ y  is same as C's   x & (~y)
+
+```
+
 
 # constants
 
@@ -200,10 +207,26 @@ func name(parameter-list) (result-list) {
 * can be package level or function level
 * iota is used for enumeration
     ```go
+    //bad -- just ints
     const (
-        a = iota
-        b           /* implicit iota */
+        Summer int = 0
+        Winter int = 1
     )
+    type Season int64
+    const (
+        Summer Season = iota
+        Winter                /* implicit iota of the same type */
+    )
+    // to stringize
+    func (s Season) String() string {
+        switch s {
+        case Summer:
+            return "summer"
+        case Autumn:
+            return "autumn"
+        }
+        return "Unk"
+    }
     ```
 * nil represents non-existing pointer or reference-type (for slices, interface).
 
@@ -537,6 +560,7 @@ complex64 complex128
         }
   ```
 
+
 ## slices
 
 * An array has a fixed size. A slice, on the other hand, is a
@@ -650,6 +674,21 @@ if value, exists := map_var[keyval] ; exists {
 * interfaces are comparable (==) if the underlying type is comparable or if both are nil.
   Otherwise, comparing uncomparable types causes runtime panic. (So this is not caught at compile time)
 * convention - if there is only method, the interface name typicall ends in er. Eg: Matcher
+
+c-equivalent of `void*` is `interface{}`
+There is now a
+```go
+type any = interface{}
+```
+
+## generics
+
+```go
+type Processor[T any] interface {
+    ProcessGrant(frequency int64, bandwidth int64) T
+}
+```
+
 
 # More on types
 
@@ -884,9 +923,18 @@ time.Time      // hold a wall-clock time akin to datetime.datetime of python
 time.Duration  // delta between 2 Time s. akine to datetime.timedelta of python
                // tracks in ns. Can diff upto 290 years.
 
-var t time.Time = time.now()      // gives the current time
-d := time.Until(t)                // gives the duration from now till t
+// Duration constants
+time.Second
+time.Hour
+a := 5 * time.Second
+
+var t time.Time = time.Now()      // gives the current time
+d := time.Until(t)                // gives the time.Duration from now till t
+n := now.Add(timeout)             // add (timeout time.Duration) in sections to now
+
+
 var h int = math.Floor(d.Hours()) // converts the duration to hours
+
 
 
 time.Afterfunc() // invoke a function after some time in its own go-routine!
@@ -912,7 +960,7 @@ func PeriodicallyReportGatewayStatus(dur time.Duration) {
     }
 }
 
-``
+```
 
 
 * time.Sleep(d Duration)
@@ -943,13 +991,21 @@ sync.Mutex
 
 ```go
 import 'encoding/json'
-
 ```
-
 
 * json.Marshall
 * json.MarshallIndent
 * json.Unmarshall  -- ignores json fields which aren't in the struct declaration
+
+## bits
+
+```go
+bits.TrailingZeros32(auint32arg)  // counts the number of trails 0z in the unit32 arg
+bits.Len32(x)                     // gives the number of bits required to represent this number
+                                  // In other words, gives the 1-idx'ed MSB-1 position
+
+```
+
 
 # Go Tools
 

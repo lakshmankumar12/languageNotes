@@ -214,3 +214,13 @@ Good links:
 * https://manybutfinite.com/post/anatomy-of-a-program-in-memory/
 
 * http://www.cs.cmu.edu/afs/cs/academic/class/15213-s03/src/interposition/mymalloc.c
+
+# bit operations
+
+
+```c
+// remote the Least sig 1-bit off
+lastBit = x & -x
+
+```
+
