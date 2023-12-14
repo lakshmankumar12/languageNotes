@@ -1,10 +1,12 @@
+# Markdown Notes
+
+[[_TOC_]]
+
 # Links for reference
 
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 
-# Markdown Notes
-
-## Headings
+# Headings
 
 ```
 # H1
@@ -21,7 +23,7 @@ Alt-H2
 ------
 ```
 
-## Text stuff
+# Text stuff
 
 * Emphasis, aka italics
     * surround with `*asterisks*` or `_underscores_`.
@@ -42,7 +44,7 @@ It works with almost all markdown flavours (the below blank line matters).
 ---
 
 
-### Code
+## Code
 
 * `monospace` or `code`
     * Have backticks around it.
@@ -64,7 +66,7 @@ print s
 No language indicated, so no syntax highlighting.
 But let's throw in a <b>tag</b>.
 ```
-### BlockQuotes
+## BlockQuotes
 
 > Blockquotes are very handy in email to emulate reply text.
 > This line is part of the same quote.
@@ -75,7 +77,7 @@ Quote break.
 > boy let's keep writing to make sure this is long enough to actually wrap for
 > everyone. Oh, you can *put* **Markdown** into a blockquote.
 
-### RAW HTML
+## RAW HTML
 
 Just type is as is. A Definition list is most useful.
 
@@ -87,7 +89,7 @@ Just type is as is. A Definition list is most useful.
   <dd>Does *not* work **very** well. Use HTML <em>tags</em>.</dd>
 </dl>
 
-### Comments:
+## Comments:
 
 [//]: # (This is a comment, it will not be included. Note everything)
 [//]: # (the colon, space, hash, paren, and comments are only one line)
@@ -187,3 +189,7 @@ Should render in most markdown flavors
 
 3 or more hyphens/asteriks/underscore
 
+
+# Table of contents
+
+* Add this `[[_TOC_]]` at the top after the first heading

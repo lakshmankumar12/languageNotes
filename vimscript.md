@@ -63,6 +63,13 @@ let a:lineContents=getline(1) "Get first line in a var
 let varName = system("command with args in a single string")
 ```
 
+## contents of a register
+
+```vim
+let var = getreg("r")
+```
+
+
 
 # notes on variables
 

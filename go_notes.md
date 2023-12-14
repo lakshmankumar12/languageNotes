@@ -268,6 +268,9 @@ a := "simple usual string"
 b := "string with an escape char\" and another\n"
 c := `raw-string literal
    that can span multiple lines`
+
+// get formatted strings
+string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
 ```
 
 
@@ -640,6 +643,9 @@ complex64 complex128
 * We can't get address to a map. However the map is itself a reference type.
 
 ```go
+var a map[string]int{}
+
+
 // check if map is empty
 if len(m) == 0 {
 
@@ -649,6 +655,11 @@ if len(m) == 0 {
 // value will be the 0-type if the keyval does't exist
 // exists is a boolean.
 if value, exists := map_var[keyval] ; exists {
+
+}
+
+//iterate.. see for section for more
+for key, value := range m {
 
 }
 
@@ -928,7 +939,7 @@ time.Second
 time.Hour
 a := 5 * time.Second
 
-var t time.Time = time.Now()      // gives the current time
+var t time.Time = time.Now()      // gives the current time. search: now current epoch
 d := time.Until(t)                // gives the time.Duration from now till t
 n := now.Add(timeout)             // add (timeout time.Duration) in sections to now
 
@@ -945,7 +956,7 @@ i, err := strconv.ParseInt("1405544146", 10, 64)
 if err != nil {
     panic(err)
 }
-tm := time.Unix(i, 0)
+tm := time.Unix(i, 0) // sec and nsec
 fmt.Println(tm)
 
 // Run a forever loop in go

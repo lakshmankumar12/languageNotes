@@ -224,3 +224,36 @@ lastBit = x & -x
 
 ```
 
+# argc parsing in c
+
+https://www.gnu.org/software/libc/manual/html_node/Argp-Example-3.html
+https://stackoverflow.com/a/24479532
+
+# common c snippets
+
+## error printing
+
+```cpp
+
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+
+int error = some_function();
+if (error < 0) {
+    /* dont miss the \n at the end !! */
+    fprintf(stderr, "something went wrong:%d, %s\n", errno, strerror(errno));
+}
+
+```
+## daemonize
+
+```cpp
+#include <unistd.h>
+
+// nochdir -- if 0, then pwd becomes /, else undisturbed
+// noclose -- if 0, then fd0,1,2 are closed. else left undisturbed
+int daemon(int nochdir, int noclose);
+
+```
+

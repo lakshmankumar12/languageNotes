@@ -97,6 +97,8 @@ assert(4<=sizeof(int), "integers are too small");
 
 ## Signatures for common function
 
+search: operator overloading
+
 ### binary operators
 
 ```
@@ -129,6 +131,15 @@ non-member:
 friend Object& operator++( Object& )      // Prefix increment
 friend Object& operator++( Object&, int ) // Postfix increment
 ```
+
+### print operator
+
+```cpp
+//add this friend to your class
+friend ostream& operator<<(ostream& os, const MyClass& cl);
+
+```
+
 
 ## Miscellaneous notes
 

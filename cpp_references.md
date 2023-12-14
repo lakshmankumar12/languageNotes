@@ -12,27 +12,27 @@ forward_list -> singly linked list
 
 ## Open a file handling errors:
 
-```
+```cpp
 int main () {
-ifstream file;
-file.exceptions ( ifstream::failbit | ifstream::badbit );
-try {
-file.open ("test.txt");
-while (!file.eof()) file.get();
-}
-catch (const ifstream::failure& e) {
-cout << "Exception opening/reading file";
-}
+    ifstream file;
+    file.exceptions ( ifstream::failbit | ifstream::badbit );
+    try {
+        file.open ("test.txt");
+        while (!file.eof()) file.get();
+    }
+    catch (const ifstream::failure& e) {
+        cout << "Exception opening/reading file";
+    }
 
-file.close();
+    file.close();
 
-return 0;
+    return 0;
 }
 ```
 
 ## Line based reading
 
-```
+```cpp
 #include <iftream>
 #include <sstream>
 #include <string>
@@ -41,26 +41,26 @@ ifstream infile('filename.txt');
 std::string line;
 while (std::getline(infile, line))
 {
-std::istringstream iss(line);
-int a, b;
-if (!(iss >> a >> b)) { break; } // error
+    std::istringstream iss(line);
+    int a, b;
+    if (!(iss >> a >> b)) { break; } // error
 
-// process pair (a,b)
+    // process pair (a,b)
 }
 ```
 
 ## Extracting tokens of a string
 
-```
+```cpp
 std::string s = "scott>=tiger>=mushroom";
 std::string delimiter = ">=";
 
 size_t pos = 0;
 std::string token;
 while ((pos = s.find(delimiter)) != std::string::npos) {
-token = s.substr(0, pos);
-std::cout << token << std::endl;
-s.erase(0, pos + delimiter.length());
+    token = s.substr(0, pos);
+    std::cout << token << std::endl;
+    s.erase(0, pos + delimiter.length());
 }
 std::cout << s << std::endl;
 ```
@@ -83,23 +83,25 @@ container.size()    /* gets len of vector deque, list, set, map */
 string.length()     /* string along has a length! Not sure of other container, but this is O(1). They are synonyms */
 ```
 
-## Iterating through a container
+## iterating through a container
+
+search: for auto vector loop iterate
 
 * C++11
 
-```
+```cpp
     for (auto it = begin (vector); it != end (vector); ++it) {
-    it->doSomething ();
+        it->doSomething ();
     }
     /* not sure where it works */
     for (auto & element : vector) {
-    element.doSomething ();
+        element.doSomething ();
     }
 
     //If you need both index and value.
     for (int i = 0; i < v.size(); i++) {
-    // .. use v[i]
-    // .. You can also use v[i-1], v[i+1] with careful checks too.
+        // .. use v[i]
+        // .. You can also use v[i-1], v[i+1] with careful checks too.
     }
 ```
 
@@ -133,7 +135,7 @@ v.end());
 
 ## Sort
 
-```
+```cpp
 #include <algorithm>
 /* sorts the container in place */
 sort(v.begin(), v.end())
@@ -145,14 +147,28 @@ sort(numbers.begin(), numbers.end(), myCustomFn);
 
 ## Rotate
 
-```
+```cpp
 /* left rotate by n */
 rotate(v.begin(),v.begin()+n,v.end())
 ```
 
-## Get typenames
+## math-y
 
 ```
+#include <cstdlib>
+int abs(int);
+long abs(long);
+long long abs(long long);
+
+int max(int, int);
+
+int min(min, min);
+```
+
+
+## Get typenames
+
+```cpp
 Container::value_type   /* gets value-type for vector, set, deque, list, set
                            gets the pair-type for map */
 Container::iterator     /* iterator type */
@@ -160,7 +176,7 @@ Container::iterator     /* iterator type */
 
 ## Accumulate
 
-```
+```cpp
 std::vector<int> v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 int sum = std::accumulate(v.begin(), v.end(), 0);  /* (begin,end,init-value,operator-fn) */
@@ -178,7 +194,7 @@ std::string s = std::accumulate(std::next(v.begin()), v.end(),
 
 * get-next/higher/value
 
-```
+```cpp
 /* returns iter to first element, that is more than a */
 upper_bound(v.begin(), v.end(), a);
 
@@ -188,7 +204,7 @@ lower_bound(v.begin(), v.end(), a);
 
 ## fill/populate/generate/assign
 
-```
+```cpp
 #include<numeric>
 std::vector<int> v(10);
 std::iota(v.begin(), v.end(), 0);  // add value++ to every element.
@@ -200,7 +216,7 @@ std::generate(v2.begin(), v2.end(), [&i](){return i++; });
 
 ## Some common member functions
 
-```
+```cpp
 v.clear()        /* Clear the container */
 v.front()        /* get value of front element  -- undefined behavior on empty containers */
 v.back()         /* get value of last element -- undefined behavior on empty containers  */
@@ -208,7 +224,7 @@ v.back()         /* get value of last element -- undefined behavior on empty con
 
 ## on new
 
-```c
+```cpp
 void * p = ::operator new(5); // allocate only!
 T * q = new (p) T();          // construct
 q->~T();                      // deconstruct: YOUR responsibility
@@ -276,18 +292,21 @@ string trim(const string& str)
 }
 ```
 
-# Math
+## building a string
 
 ```
-#include <cstdlib>
-int abs(int);
-long abs(long);
-long long abs(long long);
+std::ostringstream s;
 
-int max(int, int);
+s << "some" << "more";
+string n = s.str();
+const char* c = s.str().c_str();
 
-int min(min, min);
+/* clear -- both are reqd */
+s.str("");
+s.clear(); /* clears error flags */
+
 ```
+
 
 
 # pair
@@ -299,14 +318,47 @@ p.second()      /* gets reference to second */
 make_pair(v1,v2)  /* create a pair from 2 variables */
 ```
 
-# vector
+# stl containers
+
+Each one should have ideas on
+
+* initialization
+* addition
+* removal
+* getting
+* iterating
+
+## vector
+
+* Initialization
+```cpp
+// initialization options
+
+// no size. Its gets bigger as you add.
+vector<int> v;
+
+// give size and default copy object
+// omitting copy object uses default-contructor
+vector<Type> v(100, initValue);
+
+// initialize from initalizer-list
+vector<int> v{1,2,3};
+
+// initialize fro another iterable
+vector<int> v(src.begin(), src.end());
+
+/* Grabs space for 100 w/0 having to reallocate */
+v.reserve(100);
 
 ```
-vector<Type> v(100, initValue); /* intializes v with a size of 100 and each element to initValue(optional) */
-v.reserve(100);                 /* Grabs space for 100 w/0 having to reallocate */
 
+* Addition
+
+```cpp
 v.push_back(value);  /* adds at end */
 v.pop_back(value);   /* removes from end */
+v.back(value);       /* get reference w/o removing .. undefined behavior if v is empty */
+v.front(value);      /* get reference w/o removing .. undefined behavior if v is empty */
 
 /* int fun_taking_ref_to_type(Type &t) */
 for_each (v.begin(),v.end(), fun_taking_ref_to_type);
@@ -361,7 +413,11 @@ map's iterator is a iterator to a pair. it->first is the key, it->second is the 
 
 ## unordered_map
 
-```
+```cpp
+// with initalizer list
+unordered_map<int,int> a{{23, 1345}, {43, -8745}};
+
+
 unordered_map<key_type,value_type,hash_functor,equality_functor>
 
 #include<functional>
@@ -370,7 +426,9 @@ std::hash<int>()  // int functor.
 
 # set
 
-```
+```cpp
+
+
 //initialize
 struct CompareStructure
 {
@@ -389,6 +447,44 @@ pair<it, bool> r = s.insert(val);
 
 s.find(val) == s.end()
 ```
+
+## unordered_set
+
+```cpp
+
+#custom
+struct Point
+{
+  int x;
+  int y;
+
+  Point(int x, int y)
+  {
+    this->x = x;
+    this->y = y;
+  }
+
+  bool operator==(const Point& otherPoint) const
+  {
+    if (this->x == otherPoint.x && this->y == otherPoint.y) return true;
+    else return false;
+  }
+
+  struct HashFunction
+  {
+    size_t operator()(const Point& point) const
+    {
+      size_t xHash = std::hash<int>()(point.x);
+      size_t yHash = std::hash<int>()(point.y) << 1;
+      return xHash ^ yHash;
+    }
+  };
+};
+
+std::unordered_set<Point, Point::HashFunction> points;
+
+```
+
 
 
 # multimap
