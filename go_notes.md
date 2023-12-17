@@ -1,201 +1,76 @@
 :toc:
 
-# Packages
+# literals
 
-* Every Go program is made up of packages. Programs start running in package main.
-* By convention, the package name is the same as the last element of the import path
-    * This means, typically you put all files of a package in a folder
-    * All files in a folder must have the same package name
-* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
-  spread across source-files. Each sourcefile calls out its package as its first line.
-  However, unlike cpp, one source file is fully one package only.
-* imports can be grouped into a parenthesized, "factored" import statement.
-  This is preferred over individual imports.
-  ```go
-  import (
-      "fmt"
-      "math"
-  )
-  import myhttp "mypath/http"
-  ```
-* In Go, a name is exported if it begins with a capital letter. Otherwise its private
-  to the package its in.
-* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
-  package in "a/b" would have been named b
-* Function calls can precede function declaration within the package. Unlike c, there is
-  no declaration/definition distinction. Its just one place and go calls it declaration.
-* init() is a special no-arg, no-return-type function that can appear any number of times
-  in every file, in any package. These are called in declaraion order and are invoked
-  before the package is considered initialized.
-  init()s of all packages are called before main()
-* calling out
-  ```go
-  import _ "mypath/http"     // blank identifier
-  ```
-  triggers a intialization of the package even if no references to the package is done.
-  Otherwise compiler will complain of redundant import
+* 4 types of literals
+* Integer literals
+    * normal numbers are base-10, `0b...` is binary,
+      `0o12321` is octal, `0x...` is hex.
+    * Starting with plain `0` is octal. Avoid.
+    * You can add underscores to numbers.. They have no effect `132_456`
+        * not allowed at start, end and cant be contiguous.
+        * makes sense to add thousand-boundaries or word/byte boundaries
+* Float literals
+    * with dot and/or exponent - `1.234e6`
+    * can be in hex as well. here `p` indicates exponent prefix
+    * underscores allowed here as well
+* rune literals
+    * single-quote strings represent one utf-8 character
+        ```go
+        'u'      // simple ascii
+        '\141'   // 8-bit octal
+        '\xab'   // 8-bit hex
+        '\u0012' // 16-bit hex.
+        '\U00001234' // 32-bit unicode (notice capital U)
+        ```
+    * other escape chars:
+        ```
+        \\     | Backslash(\)
+        \000   | Unicode character with the given 3-digit 8-bit octal code point
+        \'     | Single quote ('). It is only allowed inside character literals
+        \"     | Double quote ("). It is only allowed inside interpreted string literals
+        \a     | ASCII bell (BEL)
+        \b     | ASCII backspace (BS)
+        \f     | ASCII formfeed (FF)
+        \n     | ASCII linefeed (LF
+        \r     | ASCII carriage return (CR)
+        \t     | ASCII tab (TAB)
+        \uhhhh | Unicode character with the given 4-digit 16-bit hex code point. Unicode character with the given 8-digit 32-bit hex code point.
+        \v     | ASCII vertical tab (VT)
+        \xhh   | Unicode character with the given 2-digit 8-bit hex code point.
+        ```
+* String Literals
+    * double-quote strings are regular strings
+        * supports escape chars, including `\"`
+        * not-allowed: unescaped back-slash, newline and double-quotes
+    * back-tick quoted
+        * called raw-string literals
+        * can span multiple lines.
+        * No escape chars
+            * Doesn't support another backtick inside
 
-## module management
+* Go literals are untyped.
+* they can interact with any variable that's compatible with the literal
+    * ints to float is okay
+    * 1000 to a byte is an error
+    * int/string to string/int variable is an error
+* Each literal has a default type which is used when there is not explicit variable.
 
-* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
-* you might want to let go know that for now, modules are available locally
-    ```sh
-    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
-    ```
-* this generates the mod file
-    ```sh
-    go mod tidy
-    ```
-* GOROOT/GOPATH will always be searched.
-    * GOPATH can have multiple values like PATH
-    * GOPATH/src is where source code lives.
 
-# Functions
+# consts
+
+Examples:
 
 ```go
-func name(parameter-list) (result-list) {
-    body
-}
+a := "simple usual string"
+b := "string with an escape char\" and another\n"
+c := `raw-string literal
+   that can span multiple lines`
+
+// get formatted strings
+string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
 ```
 
-* 0 or more args. 0 or more return values
-    ```go
-    func add(x int, y int) int {
-        return x + y
-    }
-    ```
-* When two or more consecutive named function parameters share a type,
-  you can omit the type from all but the last.
-    ```go
-    x int, y int
-    //to
-    x, y int
-    ```
-* Naked returns (to be avoided)
-    * This simply returns the variable with same name as parameters
-    ```go
-    func split(sum int) (x, y int) {
-        x = sum * 4 / 9
-        y = sum - x
-        return
-    }
-    ```
-* functions associated with types are called methods. These sport the anchoring
-  type in their declaration like this:
-    ```go
-    func (m *MyType) methodFunc(args int) (result int) {
-    }
-    ```
-* variadic function have ellipsis at the last arg's type.
-  This makes the funciton take any number of args of that type.
-  Internally its accessible as a slice of that type.
-* `...interface{}` makes the funciton take any type of arg any
-  number of times.
-
-## closures
-
-* go supports closures
-* Dont pass loop-vars to a function over a closure.
-* basically the closure gets a reference to the variables
-
-## go builtin functions
-
-* make
-    * used to create a slice, map, chan
-    ```go
-    // args to make in T is the type name itself
-    make ([]T, len, cap) T[]
-    make (chan T)
-    make (map[T1] T2)
-    ```
-* len
-* cap
-* new
-    * `new(T)` creates a unnamed variable of type T, initializes it to
-      zero-value, and returns `T*`, a pointer to the type.
-    * new is only a syntactic convenience, and avoids having to create a
-      name. (Different from c/cpp in this regard. In go, every variable
-      is like from heap (compiler chooses stack/heap depending on how
-      its used)
-    * To confirm:
-        ```go
-        a := new(MyType)
-        //is same as
-        a := &MyType{}
-        ```
-* append
-    * adds an element to a slice. If slice has capacity, its very fast.
-      If slice capacity doesn't fit, it creates a new array, copies
-      existing elems and then appends.
-    * Never forget to assign the result of append back to the original
-      varaible, as it could have changed.
-      ```go
-      runes = append(runes, r)
-      ```
-* copy
-    * copies from one slice to another of same len.
-    * Safe against overlapping slices.
-    * Returns number of elements actually copied - the smaller of the 2 slices. So its safe againt
-      unavailable sizes too
-* close
-    * close a channel
-* delete
-    * used to delete a key in a map
-* complex
-* real
-* imag
-* panic
-    * Takes any arg
-* recover
-
-# Variables
-
-* Initialization using the var statement. This is possible both inside
-  functions and in global scope
-    ```go
-    var name type = expression        // Everything present
-    var name = expression             // type is inferred from expression
-    var name type                     // zero-initialized name for that type
-    name := expression                // var keyword ommited because of := short-hand. type also ommited
-
-    var i, j int = 1, 2
-    ```
-* Using the `:=` construct, var is skipped and type is assumed. This also
-  help in initializing variables of different types in same statement. So
-  `:=` is for declaration and `=` is assignment.
-    ```go
-    k := 3
-    c, python, java := true, false, "no!"
-    ```
-* var statements can also be factored like import statements
-* `_` can be used in place where a variable name isnt required.
-* for all names, case matters. HeapSort and heapSort are different.
-* Go typically uses camel case. Abbreviations may be all-caps.
-* Multiple assignmenents are done in one go.
-    ```go
-    i , j = j , i  // swap i and j
-    ```
-* Always have default values
-    * 0 for numeric types, False for bool, nil for pointers.
-    * Composite type anyway build on the simple types above.
-
-## scope
-
-* very different from that of c.
-* pointers to local variables can be passed back. (very different from
-  c/cpp)
-* each function invocation will result in a different local-variable
-  pointer.
-
-# operators
-
-```
-&^  -- (golang special) x &^ y  is same as C's   x & (~y)
-
-```
-
-
-# constants
 
 * Constants are declared like variables, but with the const keyword. Constants
   can be character, string, boolean, or numeric values. Constants cannot be
@@ -231,49 +106,6 @@ func name(parameter-list) (result-list) {
 * nil represents non-existing pointer or reference-type (for slices, interface).
 
 
-## strings
-
-### literals
-
-* single-quote strings represent one utf-8 character
-    * this is referred as rune
-* double-quote strings are regular strings
-    * supports escape chars, including `\"`
-    * other escape chars:
-        ```
-        \\     | Backslash(\)
-        \000   | Unicode character with the given 3-digit 8-bit octal code point
-        \'     | Single quote ('). It is only allowed inside character literals
-        \"     | Double quote ("). It is only allowed inside interpreted string literals
-        \a     | ASCII bell (BEL)
-        \b     | ASCII backspace (BS)
-        \f     | ASCII formfeed (FF)
-        \n     | ASCII linefeed (LF
-        \r     | ASCII carriage return (CR)
-        \t     | ASCII tab (TAB)
-        \uhhhh | Unicode character with the given 4-digit 16-bit hex code point. Unicode character with the given 8-digit 32-bit hex code point.
-        \v     | ASCII vertical tab (VT)
-        \xhh   | Unicode character with the given 2-digit 8-bit hex code point.
-        ```
-* back-tick quoted
-    * called raw-string literals
-    * can span multiple lines.
-    * No escape chars
-        * Doesn't support another backtick inside
-
-Examples:
-
-```go
-a := "simple usual string"
-b := "string with an escape char\" and another\n"
-c := `raw-string literal
-   that can span multiple lines`
-
-// get formatted strings
-string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
-```
-
-
 ### more notes
 
 * always utf-8
@@ -299,137 +131,29 @@ if len(s) > 0 { ... }
   runes(Atleast the ascii ones), as the non-ascii ones anyway dont compare equal.
 * Inside a program, you can convert a string(utf-8 encoded) to slice of runes
 
-# Flow control statements
-
-## comments
-
-* comments are like cpp.
-* `//` for one line and `/* .. */` for multi line
-
-## for
-
-* for .. init, condition, post separated by ;. Unlike other languages like C,
-  Java, or Javascript there are no parentheses surrounding the three
-  components of the for statement and the braces { } are always required.
-    ```go
-    func main() {
-        sum := 0
-        for i := 0; i < 10; i++ {
-            sum += i
-        }
-        fmt.Println(sum)
-    }
-    ```
-* init and post are optional. At that point you can drop the semicolons: C's
-  while is spelled for in Go. Omitting condition makes it a infinite loop
-    ```go
-    main() {
-        sum := 1
-        for sum < 1000 {
-            sum += sum
-        }
-        fmt.Println(sum)
-    }
-    ```
-* Variables declared in for's initialization part have loop's scope
-* iterating over a slice/array (note string iteration will give runes)
-  ```go
-    var a := { 1,2,3}
-    for i,v := range a {
-      fmt.Println("%d %d",i,v)
-    }
-  ```
-* iterating over a map
-  ```go
-  for k, v := range m {
-    fmt.Printf("key[%s] value[%s]\n", k, v)
-  }
-  for k := range m {
-    fmt.Printf("only key[%s]\n", k)
-  }
-  for _,v := range m {
-    fmt.Printf("only value[%s]\n", v)
-  }
-  ```
-* iterate over a channel
-  ```go
-  for val_copy := range channel_var {
-
-  }
-  ```
-
-## if
-
-* if statements are like its for loops; the expression need not be surrounded
-  by parentheses ( ) but the braces { } are required
-* the if statement can start with a short statement to execute before the
-  condition. A var initailized here is availabe in if, else if and else.
-    ```go
-    func pow(x, n, lim float64) float64 {
-        if v := math.Pow(x, n); v < lim {
-            return v
-        }
-        return lim
-    }
-    ```
-* combine a stmt and err check like this, limiting the err's scope
-    ```go
-    if err := r.ParseForm(); err != nil {
-       log.Print(err)
-    }
-    ```
-
-## switch
-
-* Switch cases evaluate cases from top to bottom, stopping when a case succeeds
-* A case body breaks automatically, unless it ends with a fallthrough statement
-    ```go
-    func main() {
-        fmt.Print("Go runs on ")
-        switch os := runtime.GOOS; os {
-        case "darwin":
-            fmt.Println("OS X.")
-        case "linux":
-            fmt.Println("Linux.")
-        default:
-            // freebsd, openbsd,
-            // plan9, windows...
-            fmt.Printf("%s.", os)
-        }
-    }
-    ```
-* f isn't called if i == 0
-    ```go
-    switch i {
-      case 0:
-      case f():
-    }
-    ```
-* Switch without a condition is the same as switch true. This construct can be
-  a clean way to write long if-then-else chains.
-
-## Defer
-
-* A defer statement defers the execution of a function until the surrounding
-  function returns. The args to any function called, are however, evaulated
-  immediately
-* Deferred function calls are pushed onto a stack. When a function returns, its
-  deferred calls are executed in last-in-first-out order.
-
 # Types
 
 ## Basic Types
 
 ```go
 bool  // either true or false
-string
-int  int8  int16  int32  int64
-uint uint8 uint16 uint32 uint64 uintptr
-byte // alias for uint8
+      // zero val: false
+
+// integer types
+int8  int16  int32  int64
+uint8 uint16 uint32 uint64 uintptr
+byte // alias for uint8, byte is more common in go
+int uint    // depends on cpu. may be 32 or 64
+            // default type for integer literals is int
 rune // alias for int32
+uintptr
+
 // represents a Unicode code point
-float32 float64
-complex64 complex128
+float32
+float64   // default type
+complex64 complex128 // rare.
+
+string
 ```
 
 * Variables w/o Initialization is set to 0/false/empty-string
@@ -800,6 +524,325 @@ v, ok = varName.(T)
   fmt.Errorf("Whatever went wrong:%d", int_arg)
   ```
 
+
+
+# Packages
+
+* Every Go program is made up of packages. Programs start running in package main.
+* By convention, the package name is the same as the last element of the import path
+    * This means, typically you put all files of a package in a folder
+    * All files in a folder must have the same package name
+* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
+  spread across source-files. Each sourcefile calls out its package as its first line.
+  However, unlike cpp, one source file is fully one package only.
+* imports can be grouped into a parenthesized, "factored" import statement.
+  This is preferred over individual imports.
+  ```go
+  import (
+      "fmt"
+      "math"
+  )
+  import myhttp "mypath/http"
+  ```
+* In Go, a name is exported if it begins with a capital letter. Otherwise its private
+  to the package its in.
+* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
+  package in "a/b" would have been named b
+* Function calls can precede function declaration within the package. Unlike c, there is
+  no declaration/definition distinction. Its just one place and go calls it declaration.
+* init() is a special no-arg, no-return-type function that can appear any number of times
+  in every file, in any package. These are called in declaraion order and are invoked
+  before the package is considered initialized.
+  init()s of all packages are called before main()
+* calling out
+  ```go
+  import _ "mypath/http"     // blank identifier
+  ```
+  triggers a intialization of the package even if no references to the package is done.
+  Otherwise compiler will complain of redundant import
+
+## module management
+
+* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
+* you might want to let go know that for now, modules are available locally
+    ```sh
+    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
+    ```
+* this generates the mod file
+    ```sh
+    go mod tidy
+    ```
+* GOROOT/GOPATH will always be searched.
+    * GOPATH can have multiple values like PATH
+    * GOPATH/src is where source code lives.
+
+# Functions
+
+```go
+func name(parameter-list) (result-list) {
+    body
+}
+```
+
+* 0 or more args. 0 or more return values
+    ```go
+    func add(x int, y int) int {
+        return x + y
+    }
+    ```
+* When two or more consecutive named function parameters share a type,
+  you can omit the type from all but the last.
+    ```go
+    x int, y int
+    //to
+    x, y int
+    ```
+* Naked returns (to be avoided)
+    * This simply returns the variable with same name as parameters
+    ```go
+    func split(sum int) (x, y int) {
+        x = sum * 4 / 9
+        y = sum - x
+        return
+    }
+    ```
+* functions associated with types are called methods. These sport the anchoring
+  type in their declaration like this:
+    ```go
+    func (m *MyType) methodFunc(args int) (result int) {
+    }
+    ```
+* variadic function have ellipsis at the last arg's type.
+  This makes the funciton take any number of args of that type.
+  Internally its accessible as a slice of that type.
+* `...interface{}` makes the funciton take any type of arg any
+  number of times.
+
+## closures
+
+* go supports closures
+* Dont pass loop-vars to a function over a closure.
+* basically the closure gets a reference to the variables
+
+## go builtin functions
+
+* make
+    * used to create a slice, map, chan
+    ```go
+    // args to make in T is the type name itself
+    make ([]T, len, cap) T[]
+    make (chan T)
+    make (map[T1] T2)
+    ```
+* len
+* cap
+* new
+    * `new(T)` creates a unnamed variable of type T, initializes it to
+      zero-value, and returns `T*`, a pointer to the type.
+    * new is only a syntactic convenience, and avoids having to create a
+      name. (Different from c/cpp in this regard. In go, every variable
+      is like from heap (compiler chooses stack/heap depending on how
+      its used)
+    * To confirm:
+        ```go
+        a := new(MyType)
+        //is same as
+        a := &MyType{}
+        ```
+* append
+    * adds an element to a slice. If slice has capacity, its very fast.
+      If slice capacity doesn't fit, it creates a new array, copies
+      existing elems and then appends.
+    * Never forget to assign the result of append back to the original
+      varaible, as it could have changed.
+      ```go
+      runes = append(runes, r)
+      ```
+* copy
+    * copies from one slice to another of same len.
+    * Safe against overlapping slices.
+    * Returns number of elements actually copied - the smaller of the 2 slices. So its safe againt
+      unavailable sizes too
+* close
+    * close a channel
+* delete
+    * used to delete a key in a map
+* complex
+* real
+* imag
+* panic
+    * Takes any arg
+* recover
+
+# Variables
+
+* Initialization using the var statement. This is possible both inside
+  functions and in global scope
+    ```go
+    var name type = expression        // Everything present
+    var name = expression             // type is inferred from expression
+    var name type                     // zero-initialized name for that type
+    name := expression                // var keyword ommited because of := short-hand. type also ommited
+
+    var i, j int = 1, 2
+    ```
+* Using the `:=` construct, var is skipped and type is assumed. This also
+  help in initializing variables of different types in same statement. So
+  `:=` is for declaration and `=` is assignment.
+    ```go
+    k := 3
+    c, python, java := true, false, "no!"
+    ```
+* var statements can also be factored like import statements
+* `_` can be used in place where a variable name isnt required.
+* for all names, case matters. HeapSort and heapSort are different.
+* Go typically uses camel case. Abbreviations may be all-caps.
+* Multiple assignmenents are done in one go.
+    ```go
+    i , j = j , i  // swap i and j
+    ```
+* Always have default values
+    * 0 for numeric types, False for bool, nil for pointers.
+    * Composite type anyway build on the simple types above.
+
+## scope
+
+* very different from that of c.
+* pointers to local variables can be passed back. (very different from
+  c/cpp)
+* each function invocation will result in a different local-variable
+  pointer.
+
+# operators
+
+```
+&^  -- (golang special) x &^ y  is same as C's   x & (~y)
+
+```
+
+
+# Flow control statements
+
+## semi-colons
+
+* dont bother putting them.
+* The compiler will auto-fill them for compilation intelligently.
+
+## comments
+
+* comments are like cpp.
+* `//` for one line and `/* .. */` for multi line
+
+## for
+
+* for .. init, condition, post separated by ;. Unlike other languages like C,
+  Java, or Javascript there are no parentheses surrounding the three
+  components of the for statement and the braces { } are always required.
+    ```go
+    func main() {
+        sum := 0
+        for i := 0; i < 10; i++ {
+            sum += i
+        }
+        fmt.Println(sum)
+    }
+    ```
+* init and post are optional. At that point you can drop the semicolons: C's
+  while is spelled for in Go. Omitting condition makes it a infinite loop
+    ```go
+    main() {
+        sum := 1
+        for sum < 1000 {
+            sum += sum
+        }
+        fmt.Println(sum)
+    }
+    ```
+* Variables declared in for's initialization part have loop's scope
+* iterating over a slice/array (note string iteration will give runes)
+  ```go
+    var a := { 1,2,3}
+    for i,v := range a {
+      fmt.Println("%d %d",i,v)
+    }
+  ```
+* iterating over a map
+  ```go
+  for k, v := range m {
+    fmt.Printf("key[%s] value[%s]\n", k, v)
+  }
+  for k := range m {
+    fmt.Printf("only key[%s]\n", k)
+  }
+  for _,v := range m {
+    fmt.Printf("only value[%s]\n", v)
+  }
+  ```
+* iterate over a channel
+  ```go
+  for val_copy := range channel_var {
+
+  }
+  ```
+
+## if
+
+* if statements are like its for loops; the expression need not be surrounded
+  by parentheses ( ) but the braces { } are required
+* the if statement can start with a short statement to execute before the
+  condition. A var initailized here is availabe in if, else if and else.
+    ```go
+    func pow(x, n, lim float64) float64 {
+        if v := math.Pow(x, n); v < lim {
+            return v
+        }
+        return lim
+    }
+    ```
+* combine a stmt and err check like this, limiting the err's scope
+    ```go
+    if err := r.ParseForm(); err != nil {
+       log.Print(err)
+    }
+    ```
+
+## switch
+
+* Switch cases evaluate cases from top to bottom, stopping when a case succeeds
+* A case body breaks automatically, unless it ends with a fallthrough statement
+    ```go
+    func main() {
+        fmt.Print("Go runs on ")
+        switch os := runtime.GOOS; os {
+        case "darwin":
+            fmt.Println("OS X.")
+        case "linux":
+            fmt.Println("Linux.")
+        default:
+            // freebsd, openbsd,
+            // plan9, windows...
+            fmt.Printf("%s.", os)
+        }
+    }
+    ```
+* f isn't called if i == 0
+    ```go
+    switch i {
+      case 0:
+      case f():
+    }
+    ```
+* Switch without a condition is the same as switch true. This construct can be
+  a clean way to write long if-then-else chains.
+
+## Defer
+
+* A defer statement defers the execution of a function until the surrounding
+  function returns. The args to any function called, are however, evaulated
+  immediately
+* Deferred function calls are pushed onto a stack. When a function returns, its
+  deferred calls are executed in last-in-first-out order.
+
 # Other Go statements
 
 ## range
@@ -1018,10 +1061,10 @@ bits.Len32(x)                     // gives the number of bits required to repres
 ```
 
 
-# Go Tools
+# Go tools
 
 ```sh
-go build         # creates a exe in same dir.
+go build         # creates a exe in same dir with same name as package main file name
 go build -o /path/to/exec file.go
 go run file.go   # Just run as a script
 go install       # build, but put exe in $GOPATH/bin
@@ -1029,6 +1072,11 @@ go install       # build, but put exe in $GOPATH/bin
 go test path1/path2/a.go   # Not sure. check
 
 go get abc.com/repo_name/path/file.go  # pulls that file (repo) in $GOPATH/src
+
+# the @is the version to pull. latest is well, latest
+# same command for both first time and for install.
+# it fetch and also compiles
+go install github.com/rakyll/hey@latest
 
 # cleans executables
 go clean file.go
@@ -1038,8 +1086,21 @@ go mod init path/from/gopath/src/to/this/package
 
 go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
 
+# verifies unnecessary imports and adds imports
+# but can be wrong.
+goimports -l -w .
+## args
+##  -l      .. print lines with incorrect formatting
+##  -w      .. write files in place
+
+# format a file
+go fmt file.go
+
+## line the entire project
+golint ./...
+
+## detect printf args correct etc..
 go vet file.go
-go fmt file.go  # formats a file
 
 ```
 
