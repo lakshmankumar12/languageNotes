@@ -282,11 +282,11 @@ tasks:
     command: "uptime"
     register: somevariablename
 
-  - name: dump it with debug
-    debug: msg="Output of uptime was {{somevariablename}}"
-
   - name: another way to show
     debug: var=somevariablename
+
+  - name: dump it with debug
+    debug: msg="Output of uptime was {{somevariablename}}"
 ```
 
 ## setup

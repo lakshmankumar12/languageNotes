@@ -48,6 +48,16 @@
         * can span multiple lines.
         * No escape chars
             * Doesn't support another backtick inside
+        ```go
+        a := "simple usual string"
+        b := "string with an escape char\" and another\n"
+        c := `raw-string literal
+           that can span multiple lines`
+
+        // get formatted strings
+        string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
+        ```
+* The last rare one is complex literal with a `i`
 
 * Go literals are untyped.
 * they can interact with any variable that's compatible with the literal
@@ -57,20 +67,8 @@
 * Each literal has a default type which is used when there is not explicit variable.
 
 
+
 # consts
-
-Examples:
-
-```go
-a := "simple usual string"
-b := "string with an escape char\" and another\n"
-c := `raw-string literal
-   that can span multiple lines`
-
-// get formatted strings
-string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
-```
-
 
 * Constants are declared like variables, but with the const keyword. Constants
   can be character, string, boolean, or numeric values. Constants cannot be
@@ -79,6 +77,8 @@ string_var := fmt.Sprintf("item1: %s item2: %d", message, year)
   from the literal. Or if we have a typename (typically from type declaration,
   it can be used too). When type is absent, its untyped. So its of any one
   flavor - boolean, int, rune, floating-point, complex, string.
+* The const value has to be compile time derivable.
+    * We can't have consts whose value are found at runtime.
 * can be package level or function level
 * iota is used for enumeration
     ```go
@@ -153,12 +153,50 @@ float32
 float64   // default type
 complex64 complex128 // rare.
 
-string
+string   // zero val: empty string
 ```
 
 * Variables w/o Initialization is set to 0/false/empty-string
+* No automatic type conversion between types.
+    ```go
+    var x int = 10
+    var y float64 = 30.2
+    var z float64 = float64(x) + y
+    var d int = x + int(y)
+    ```
+* No implicitly truthy to any variables. i.e no automation boolean conversion
+    * Use comparison operator
 * Note, there is only one basic type which is a pointer.
   This is big enuf to hold any poitner.
+
+## operations on basic types
+
+### integers
+
+* Standard arithmetic
+    ```
+    + - * / % .. and all support +=, -=, .. %= versions
+    ```
+* integers can be compared - `== != < > <= >=`
+* Integers have bit operators - `<< >> & | ^ &^`.
+    * these support assignment variants `&= |= <<= >>= ^= &^=`
+    * `&^`  -- (golang special) `x &^ y`  is same as C's   `x & (~y)`
+
+### floats
+
+* no modulus ofcourse
+* Dont compare floats with `== !=`.. although language allows it.
+
+## strings
+
+* Comparisions are okay -  `== != < > <= >=`
+* Can be concatenated by `+`
+* Are immutable
+* Note that a string is an array of bytes (not runes). So, if you slice it you get bytes.
+    * unless its ascii, the results will be unpredictable.
+* bytes and runes can be type-casted to string.
+* int gets type-casted .. but is best avoided.
+
 
 ## Pointers
 
@@ -168,73 +206,6 @@ string
 * Its okay to take pointers to struct members
 * Pointers are useful to pass by reference (like a slice that might be
   modified in a function)
-
-## structs
-
-* A struct is a collection of fields. Fields are accessed using dot. (dot
-  is called selector in go. It selects which field or method to use)
-    ```go
-    type Vertex struct {
-        X int
-        Y int
-    }
-    ```
-* To access the field X of a struct when we have the struct pointer p we could
-  write `(*p).X`. However, that notation is cumbersome, so the language permits
-  us instead to write just p.X, without the explicit dereference.
-  * whether u have direct struct var or pointer to struct, u can still use dot
-* Struct literal is much like c
-* Capital letter rules follow for struct too. If the struct type name is
-  capitalized, the type is exported. If the individual members are caps, they
-  are exported. A struct can have mix of exported and non-exported members.
-* struct literal is of two type
-    ```go
-    type Point struct { X, Y  int }
-    Point{1,2}
-    Point{X:1, Y:2}
-    ```
-* Functions that return struct, can better return struct-pointer. This will
-  make function call be a L-value
-* Struct can't have the same struct inside, but have a pointer of itself.
-  (like c)
-* Structs can embed other structures inside (anonyomous members). This has
-  benefit of accessing members directly + invoking methods of the embedded
-  type directly. However, this implicit behavior as receiver is only
-  limited to receiver. We cant pass as args the outer Type, where embedded
-  type is expected.
-* Structs can have field-tags. These are any literal string. One eg is the
-    ```go
-        type Identity struct {
-            Value isIdentity_Value `protobuf_oneof:"Value"`
-        }
-        type Feed struct {
-            Name string `json:"site"`
-            URI  string `json:"link"`
-            Type string `json:"type"`
-        }
-    ```
-* empty structs are allowed. They take 0 bytes. Typically used to define types
-  with methods on them (to fit into a interface) and offer default functionality
-
-### methods
-
-* The object on which method is called is referred as receiver
-* We can define methods for any type (basic-types, named-types, slices, maps)
-  We can't however define methods for pointers and interfaces. (Pointer methods
-  are treated as methods of the pointed-type itself)
-  * if u have a pointer/actual variable, the compiler will automatically choose
-    the right way to pass to receiver
-  * Methods declared with pointer receivers can only be called by
-    interface type values that contain pointers.
-  * Methods declared with value receivers can be called by interface type values
-    that contain both values and pointers.
-* methods can be defined only in the same package where the type is defined.
-* by convention either declare all methods on type or on pointer. Only pointer
-  methods can change the receiver though.
-    * Compiler will implicitly make a T as *T if only *T is a receiver. However,
-       when T is passed as-is as interface{} (Like to fmt.Printf), then there is
-       no implicit conversion! So `(*T).String()` may not work!
-* its okay for a receiver to be nil
 
 ## arrays
 
@@ -263,6 +234,9 @@ string
      b := [4]*int{ 2:new(int) }
   ```
 * every size is different type. `[5]int` is different from `[3]int`
+    * This makes it very rigid and usable directly in most places
+        * we cant type-cast from one size to another
+        * we cant assign 2 diff size arrays to same variable.
 * len(array) gives its length
 * Array copy works as long as both are of same types
   ```go
@@ -277,7 +251,7 @@ string
 * (Yet to grasp this fully: Be wary of saying/mentioning arrays in go. May be
   the slice is more appropriate). Note that []T is a slice of T, not array of T,
   but [n]T is an array.
-* multi-dimensional arrays are support
+* multi-dimensional arrays are supported
   ```go
      a := [3][2]string{
         {"lion", "tiger"},
@@ -286,6 +260,9 @@ string
                                //The compiler will complain if you omit this comma
         }
   ```
+* Array supports comparison operator `==` and `!=`
+* out of bound access with compile-time decided index value will give compilation error
+* out of bound access with run time index value will cause panic
 
 
 ## slices
@@ -323,6 +300,7 @@ string
     // Use a slice literal to create an empty slice of integers.
     slice := []int{}
     ```
+* slices cannot be compared with one another, but can be compared against `nil`
 * Can be created with a built-in function - make. Note the odditity. The first
   args is a type-name (and not a var-name). This creates a unnamed array and
   then returns a slice to that array. The returned slice is the only way
@@ -341,10 +319,13 @@ string
     // Contains a length of 2 and capacity of 4 elements.
     newSlice := slice[1:3]
     ```
-* append adds to a slice and returns a new slice. NOTE : it DOESNT modify source slice
-  variable. So copy it back as return value to update the variable
+* append adds to a slice and returns a new slice. Note: It may or may not modify the
+  slice (depends on if there is a capacity). So copy it back as return value to
+  update the variable. Its a compile error if append's return value isn't captured
   ```go
   slice = append(slice, 10)
+  // add more than one value
+  slice = append(slice, 20, 30)
   // if s1 and s2 are themselves slices
   slice = append(slice, s1, s2...)
   ```
@@ -367,7 +348,14 @@ string
 * We can't get address to a map. However the map is itself a reference type.
 
 ```go
-var a map[string]int{}
+var a map[string]int   // creates a nil map
+var a map[string]int{} // creates a empty map. This is a map literal.
+teams := map[string][]string {        // directly creates a map.
+        "Orcas": []string{"Fred", "Ralph", "Bijou"},
+        "Lions": []string{"Sarah", "Peter", "Billie"},
+        "Kittens": []string{"Waldo", "Raul", "Ze"},
+    }
+ages := make(map[int][]string, 10)  // create a map with size 10
 
 
 // check if map is empty
@@ -377,17 +365,137 @@ if len(m) == 0 {
 
 // lookup:
 // value will be the 0-type if the keyval does't exist
-// exists is a boolean.
-if value, exists := map_var[keyval] ; exists {
+// ok(exists) is a boolean.
+if val, ok := map_var[key] ; ok {
 
 }
+
+// non existing keys
+totalWins := map[string]int{}
+totalWins["Orcas"] = 1
+totalWins["Lions"] = 2
+fmt.Println(totalWins["Orcas"])
+fmt.Println(totalWins["Kittens"])    // non-existing key.. prints 0-value for the int-type
+totalWins["Kittens"]++               // non-existing key.. automatically assign 0s and ++. So finally 1
+fmt.Println(totalWins["Kittens"])
+totalWins["Lions"] = 3
+fmt.Println(totalWins["Lions"])
 
 //iterate.. see for section for more
 for key, value := range m {
 
 }
 
+// deleting..
+// no problem if key doesn't exist or even if m is nil
+// no return value
+delete(m, key)
+
 ```
+
+## structs
+
+* A struct is a collection of fields.
+    ```go
+    type Vertex struct {
+        X int
+        Y int
+    }
+    ```
+* struct literals:
+    ```go
+    type Point struct { X, Y  int }
+    var p Point{}  // members get their nil values
+    var p Point    // same as above. (unlike maps .. there is no nil struct value)
+
+    // type-1 .. comma separated list. Depends on order of defn.
+    Point{1,2}
+    // type-2 .. map-style. explicitly called out name of fields to value
+    Point{X:1, Y:2}
+    ```
+* Fields are accessed using dot. (dot is called selector in go. It selects
+  which field or method to use)
+* To access the field X of a struct when we have the struct pointer p we could
+  write `(*p).X`. However, that notation is cumbersome, so the language permits
+  us instead to write just p.X, without the explicit dereference.
+  * whether u have direct struct var or pointer to struct, u can still use dot
+* Capital letter rules follow for struct too. If the struct type name is
+  capitalized, the type is exported. If the individual members are caps, they
+  are exported. A struct can have mix of exported and non-exported members.
+* Functions that return struct, can better return struct-pointer. This will
+  make function call be a L-value
+* Struct can't have the same struct inside, but have a pointer of itself.
+  (like c)
+* Structs can embed other structures inside (anonyomous members). This has
+  benefit of accessing members directly + invoking methods of the embedded
+  type directly. However, this implicit behavior as receiver is only
+  limited to receiver. We cant pass as args the outer Type, where embedded
+  type is expected.
+* Structs can have field-tags. These are any literal string. One eg is the
+    ```go
+        type Identity struct {
+            Value isIdentity_Value `protobuf_oneof:"Value"`
+        }
+        type Feed struct {
+            Name string `json:"site"`
+            URI  string `json:"link"`
+            Type string `json:"type"`
+        }
+    ```
+* empty structs are allowed. They take 0 bytes. Typically used to define types
+  with methods on them (to fit into a interface) and offer default functionality
+* structs can be defined globally(pkg scope) or defined within function.
+    * the in-function defined structs are only visible inside the function
+    * well.. structs can be scoped to any block level.
+
+### anonymous structs
+
+* used is marshalling/unmarshalling external data like json/protobuf
+* writing tests is also when this use pops up
+
+```go
+// using var varname
+var person struct {
+    name string
+    age int
+    pet string
+}
+person.name = "bob"
+person.age = 50
+person.pet = "dog"
+
+// using :=
+pet := struct {
+    name string
+    kind string
+}{
+    name: "Fido",
+    kind: "dog",
+}
+
+```
+
+
+### methods
+
+* The object on which method is called is referred as receiver
+* We can define methods for any type (basic-types, named-types, slices, maps)
+  We can't however define methods for pointers and interfaces. (Pointer methods
+  are treated as methods of the pointed-type itself)
+  * if u have a pointer/actual variable, the compiler will automatically choose
+    the right way to pass to receiver
+  * Methods declared with pointer receivers can only be called by
+    interface type values that contain pointers.
+  * Methods declared with value receivers can be called by interface type values
+    that contain both values and pointers.
+* methods can be defined only in the same package where the type is defined.
+* by convention either declare all methods on type or on pointer. Only pointer
+  methods can change the receiver though.
+    * Compiler will implicitly make a T as *T if only *T is a receiver. However,
+       when T is passed as-is as interface{} (Like to fmt.Printf), then there is
+       no implicit conversion! So `(*T).String()` may not work!
+* its okay for a receiver to be nil
+
 
 
 ## channel
@@ -426,6 +534,15 @@ type Processor[T any] interface {
 
 
 # More on types
+
+## Comparability/compare/equality/==
+
+* basic types are comparable.
+* struct made of comparable basic types or structs are comparable.
+* interfaces are comparable if its current-type is comparable.
+* slices/maps/functions are NOT comparable.
+* array compares true if size is same and each of underlying value is
+  comparable and equal.
 
 ## composite literal
 
@@ -505,76 +622,225 @@ Not sure.. To read more on this
 v, ok = varName.(T)
 ```
 
-# Comparability/compare/equality/==
+# Variables
 
-* basic types are comparable.
-* struct made of comparable basic types or structs are comparable.
-* interfaces are comparable if its current-type is comparable.
-* slices/maps/functions are NOT comparable.
-* array compares true if size is same and each of underlying value is
-  comparable and equal.
+* Initialization using the var statement. This is possible both inside
+  functions and in global scope
+    ```go
+    var name type = expression        // Everything present
+    var name = expression             // type is inferred from expression
+    var name type                     // zero-initialized name for that type
+    name := expression                // var keyword ommited because of := short-hand.
+                                      // type also ommited
+                                      // cannot be used at global(pkg) scope
 
-# Popular types/interfaces
+    var i, j int = 1, 2
 
-## error
+    var (                             // called a declaration list
+        x int
+        y = 20
+        z int = 30
+        d, e = 40, "hello"
+        f, g string
+    )
 
-* Is an interface type. nil implies no error.
-* To generate a error:
-  ```go
-  fmt.Errorf("Whatever went wrong:%d", int_arg)
-  ```
-
-
-
-# Packages
-
-* Every Go program is made up of packages. Programs start running in package main.
-* By convention, the package name is the same as the last element of the import path
-    * This means, typically you put all files of a package in a folder
-    * All files in a folder must have the same package name
-* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
-  spread across source-files. Each sourcefile calls out its package as its first line.
-  However, unlike cpp, one source file is fully one package only.
-* imports can be grouped into a parenthesized, "factored" import statement.
-  This is preferred over individual imports.
-  ```go
-  import (
-      "fmt"
-      "math"
-  )
-  import myhttp "mypath/http"
-  ```
-* In Go, a name is exported if it begins with a capital letter. Otherwise its private
-  to the package its in.
-* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
-  package in "a/b" would have been named b
-* Function calls can precede function declaration within the package. Unlike c, there is
-  no declaration/definition distinction. Its just one place and go calls it declaration.
-* init() is a special no-arg, no-return-type function that can appear any number of times
-  in every file, in any package. These are called in declaraion order and are invoked
-  before the package is considered initialized.
-  init()s of all packages are called before main()
-* calling out
-  ```go
-  import _ "mypath/http"     // blank identifier
-  ```
-  triggers a intialization of the package even if no references to the package is done.
-  Otherwise compiler will complain of redundant import
-
-## module management
-
-* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
-* you might want to let go know that for now, modules are available locally
-    ```sh
-    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
     ```
-* this generates the mod file
-    ```sh
-    go mod tidy
+* Using the `:=` construct, var is skipped and type is assumed. This also
+  help in initializing variables of different types in same statement. So
+  `:=` is for declaration and `=` is assignment.
+    ```go
+    k := 3
+    c, python, java := true, false, "no!"
     ```
-* GOROOT/GOPATH will always be searched.
-    * GOPATH can have multiple values like PATH
-    * GOPATH/src is where source code lives.
+* var statements can also be factored like import statements
+* `_` can be used in place where a variable name isnt required.
+* for all names, case matters. HeapSort and heapSort are different.
+* Go typically uses camel case. Abbreviations may be all-caps.
+* Multiple assignmenents are done in one go.
+    ```go
+    i , j = j , i  // swap i and j
+    ```
+* Always have default values
+    * 0 for numeric types, False for bool, nil for pointers.
+    * Composite type anyway build on the simple types above.
+
+## scope
+
+* very different from that of c.
+* global scope is package scope in go.
+
+* pointers to local variables can be passed back. (very different from
+  c/cpp)
+* each function invocation will result in a different local-variable
+  pointer.
+
+# Flow control statements
+
+## semi-colons
+
+* dont bother putting them.
+* The compiler will auto-fill them for compilation intelligently.
+
+## comments
+
+* comments are like cpp.
+* `//` for one line and `/* .. */` for multi line
+
+## for
+
+* complete-for statement.
+    * has init/ condition/ post parts
+    ```go
+    {
+        sum := 0
+        for i := 0; i < 10; i++ {
+            sum += i
+        }
+        fmt.Println(sum)
+    }
+    ```
+* init and post are optional. At that point you can drop the semicolons: C's
+  while is spelled for in Go. Omitting condition makes it a infinite loop
+    ```go
+    {
+        sum := 1
+        for sum < 1000 {
+            sum += sum
+        }
+        fmt.Println(sum)
+        for {
+            fmt.Println("This will be infinitely printed")
+        }
+    }
+    ```
+* Variables declared in for's initialization part have loop's scope
+* there is `break` and `continue`
+* iterating over a slice/array (note string iteration will give runes)
+  ```go
+    var a := { 1,2,3}
+    for i,v := range a {  // use _, v if u need only value.
+      fmt.Println("%d %d",i,v)
+    }
+  ```
+* iterating a string gives the runes.
+    * Note that slice a string gives bytes.
+    ```go
+    sample := "apple_π!"
+    for i, r := range sample {
+        fmt.Println(i, r, string(r)) // you get to see the unicode points
+    }
+    ```
+    * if a string contains junk utf-8 char, you get 0xfffd as the rune
+* iterating over a map
+  ```go
+  for k, v := range m {
+    fmt.Printf("key[%s] value[%s]\n", k, v)
+  }
+  for k := range m {
+    fmt.Printf("only key[%s]\n", k)
+  }
+  for _,v := range m {
+    fmt.Printf("only value[%s]\n", v)
+  }
+  ```
+* iterate over a channel
+  ```go
+  for val_copy := range channel_var {
+
+  }
+  ```
+
+* Note that for-range, gets a copy of the value. You dont modify the underlying type
+
+* Loop labelling
+    ```go
+    func main() {
+        samples := []string{"hello", "apple_π!"}
+        outer:
+        for _, sample := range samples {
+            for i, r := range sample {
+                fmt.Println(i, r, string(r))
+                if r == 'l' {
+                    continue outer // note the label
+                }
+            }
+            fmt.Println()
+        }
+    }
+    ```
+
+
+## if
+
+* if statements are like its for loops;
+    * the expression is NOT surrounded by parentheses ( )
+    * the braces { } are required
+* the if statement can start with a short statement to execute before the
+  condition. A var initailized here is availabe in if, else if and else.
+    ```go
+    func pow(x, n, lim float64) float64 {
+        if v := math.Pow(x, n); v < lim {
+            return v
+        }
+        return lim
+    }
+    ```
+* combine a stmt and err check like this, limiting the err's scope
+    ```go
+    if err := r.ParseForm(); err != nil {
+       log.Print(err)
+    }
+    ```
+* if .. else if
+    ```go
+    if n := rand.Intn(10) ; n == 0 {   // n is available for the while of if/else/if
+        fmt.Println("That's too low")
+    } else if n > 5 {
+        fmt.Println("That's too big:", n)
+    } else {
+        fmt.Println("That's a good number:", n)
+    }
+    ```
+
+## switch
+
+* Switch cases evaluate cases from top to bottom, stopping when a case succeeds
+* A case body breaks automatically, unless it ends with a fallthrough statement
+    ```go
+    func main() {
+        fmt.Print("Go runs on ")
+        switch os := runtime.GOOS; os {
+        case "darwin":
+            fmt.Println("OS X.")
+        case "linux":
+            fmt.Println("Linux.")
+        default:
+            // freebsd, openbsd,
+            // plan9, windows...
+            fmt.Printf("%s.", os)
+        }
+    }
+    ```
+* break is implied -- need not be coded. f isn't called if i == 0 or 1
+    ```go
+    switch i {
+      case 0, 1:
+      case f():
+    }
+    ```
+    * use `fallthrough` if you realy want it. but should be rare.
+    * `break` can break before the end of case.
+* we can have multiple values in a single case.
+* Switch without a condition is the same as switch true. This construct can be
+  a clean way to write long if-then-else chains.
+
+## Defer
+
+* A defer statement defers the execution of a function until the surrounding
+  function returns. The args to any function called, are however, evaulated
+  immediately
+* Deferred function calls are pushed onto a stack. When a function returns, its
+  deferred calls are executed in last-in-first-out order.
 
 # Functions
 
@@ -659,10 +925,14 @@ func name(parameter-list) (result-list) {
       runes = append(runes, r)
       ```
 * copy
-    * copies from one slice to another of same len.
+    * copies from one slice to another. It stops as the shortest of the two.
+        ```go
+        num_copied = copy(dst, src)
+        ```
+    * cap of the two doesnt matter. its the len that matters
     * Safe against overlapping slices.
-    * Returns number of elements actually copied - the smaller of the 2 slices. So its safe againt
-      unavailable sizes too
+    * Returns number of elements actually copied - the smaller of the 2 slices.
+      So its safe againt unavailable sizes too
 * close
     * close a channel
 * delete
@@ -674,187 +944,69 @@ func name(parameter-list) (result-list) {
     * Takes any arg
 * recover
 
-# Variables
 
-* Initialization using the var statement. This is possible both inside
-  functions and in global scope
-    ```go
-    var name type = expression        // Everything present
-    var name = expression             // type is inferred from expression
-    var name type                     // zero-initialized name for that type
-    name := expression                // var keyword ommited because of := short-hand. type also ommited
+# Popular types/interfaces
 
-    var i, j int = 1, 2
-    ```
-* Using the `:=` construct, var is skipped and type is assumed. This also
-  help in initializing variables of different types in same statement. So
-  `:=` is for declaration and `=` is assignment.
-    ```go
-    k := 3
-    c, python, java := true, false, "no!"
-    ```
-* var statements can also be factored like import statements
-* `_` can be used in place where a variable name isnt required.
-* for all names, case matters. HeapSort and heapSort are different.
-* Go typically uses camel case. Abbreviations may be all-caps.
-* Multiple assignmenents are done in one go.
-    ```go
-    i , j = j , i  // swap i and j
-    ```
-* Always have default values
-    * 0 for numeric types, False for bool, nil for pointers.
-    * Composite type anyway build on the simple types above.
+## error
 
-## scope
-
-* very different from that of c.
-* pointers to local variables can be passed back. (very different from
-  c/cpp)
-* each function invocation will result in a different local-variable
-  pointer.
-
-# operators
-
-```
-&^  -- (golang special) x &^ y  is same as C's   x & (~y)
-
-```
-
-
-# Flow control statements
-
-## semi-colons
-
-* dont bother putting them.
-* The compiler will auto-fill them for compilation intelligently.
-
-## comments
-
-* comments are like cpp.
-* `//` for one line and `/* .. */` for multi line
-
-## for
-
-* for .. init, condition, post separated by ;. Unlike other languages like C,
-  Java, or Javascript there are no parentheses surrounding the three
-  components of the for statement and the braces { } are always required.
-    ```go
-    func main() {
-        sum := 0
-        for i := 0; i < 10; i++ {
-            sum += i
-        }
-        fmt.Println(sum)
-    }
-    ```
-* init and post are optional. At that point you can drop the semicolons: C's
-  while is spelled for in Go. Omitting condition makes it a infinite loop
-    ```go
-    main() {
-        sum := 1
-        for sum < 1000 {
-            sum += sum
-        }
-        fmt.Println(sum)
-    }
-    ```
-* Variables declared in for's initialization part have loop's scope
-* iterating over a slice/array (note string iteration will give runes)
+* Is an interface type. nil implies no error.
+* To generate a error:
   ```go
-    var a := { 1,2,3}
-    for i,v := range a {
-      fmt.Println("%d %d",i,v)
-    }
-  ```
-* iterating over a map
-  ```go
-  for k, v := range m {
-    fmt.Printf("key[%s] value[%s]\n", k, v)
-  }
-  for k := range m {
-    fmt.Printf("only key[%s]\n", k)
-  }
-  for _,v := range m {
-    fmt.Printf("only value[%s]\n", v)
-  }
-  ```
-* iterate over a channel
-  ```go
-  for val_copy := range channel_var {
-
-  }
+  fmt.Errorf("Whatever went wrong:%d", int_arg)
   ```
 
-## if
 
-* if statements are like its for loops; the expression need not be surrounded
-  by parentheses ( ) but the braces { } are required
-* the if statement can start with a short statement to execute before the
-  condition. A var initailized here is availabe in if, else if and else.
-    ```go
-    func pow(x, n, lim float64) float64 {
-        if v := math.Pow(x, n); v < lim {
-            return v
-        }
-        return lim
-    }
+
+# Packages
+
+* Every Go program is made up of packages. Programs start running in package main.
+* By convention, the package name is the same as the last element of the import path
+    * This means, typically you put all files of a package in a folder
+    * All files in a folder must have the same package name
+* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
+  spread across source-files. Each sourcefile calls out its package as its first line.
+  However, unlike cpp, one source file is fully one package only.
+* imports can be grouped into a parenthesized, "factored" import statement.
+  This is preferred over individual imports.
+  ```go
+  import (
+      "fmt"
+      "math"
+  )
+  import myhttp "mypath/http"
+  ```
+* In Go, a name is exported if it begins with a capital letter. Otherwise its private
+  to the package its in.
+* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
+  package in "a/b" would have been named b
+* Function calls can precede function declaration within the package. Unlike c, there is
+  no declaration/definition distinction. Its just one place and go calls it declaration.
+* init() is a special no-arg, no-return-type function that can appear any number of times
+  in every file, in any package. These are called in declaraion order and are invoked
+  before the package is considered initialized.
+  init()s of all packages are called before main()
+* calling out
+  ```go
+  import _ "mypath/http"     // blank identifier
+  ```
+  triggers a intialization of the package even if no references to the package is done.
+  Otherwise compiler will complain of redundant import
+
+## module management
+
+* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
+* you might want to let go know that for now, modules are available locally
+    ```sh
+    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
     ```
-* combine a stmt and err check like this, limiting the err's scope
-    ```go
-    if err := r.ParseForm(); err != nil {
-       log.Print(err)
-    }
+* this generates the mod file
+    ```sh
+    go mod tidy
     ```
+* GOROOT/GOPATH will always be searched.
+    * GOPATH can have multiple values like PATH
+    * GOPATH/src is where source code lives.
 
-## switch
-
-* Switch cases evaluate cases from top to bottom, stopping when a case succeeds
-* A case body breaks automatically, unless it ends with a fallthrough statement
-    ```go
-    func main() {
-        fmt.Print("Go runs on ")
-        switch os := runtime.GOOS; os {
-        case "darwin":
-            fmt.Println("OS X.")
-        case "linux":
-            fmt.Println("Linux.")
-        default:
-            // freebsd, openbsd,
-            // plan9, windows...
-            fmt.Printf("%s.", os)
-        }
-    }
-    ```
-* f isn't called if i == 0
-    ```go
-    switch i {
-      case 0:
-      case f():
-    }
-    ```
-* Switch without a condition is the same as switch true. This construct can be
-  a clean way to write long if-then-else chains.
-
-## Defer
-
-* A defer statement defers the execution of a function until the surrounding
-  function returns. The args to any function called, are however, evaulated
-  immediately
-* Deferred function calls are pushed onto a stack. When a function returns, its
-  deferred calls are executed in last-in-first-out order.
-
-# Other Go statements
-
-## range
-
-Typically used in for statements. Is like an iterator. Gives 0-based-index, value
-
-```go
-var a := { 1,2,3}
-for i,v := range a {
-  fmt.Println("%d %d",i,v)
-}
-```
 
 # Managing Go code
 
