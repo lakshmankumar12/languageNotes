@@ -66,47 +66,7 @@
     * int/string to string/int variable is an error
 * Each literal has a default type which is used when there is not explicit variable.
 
-
-
-# consts
-
-* Constants are declared like variables, but with the const keyword. Constants
-  can be character, string, boolean, or numeric values. Constants cannot be
-  declared using the := syntax.
-* Type info can be absent in the const declaration. In this case, its derived
-  from the literal. Or if we have a typename (typically from type declaration,
-  it can be used too). When type is absent, its untyped. So its of any one
-  flavor - boolean, int, rune, floating-point, complex, string.
-* The const value has to be compile time derivable.
-    * We can't have consts whose value are found at runtime.
-* can be package level or function level
-* iota is used for enumeration
-    ```go
-    //bad -- just ints
-    const (
-        Summer int = 0
-        Winter int = 1
-    )
-    type Season int64
-    const (
-        Summer Season = iota
-        Winter                /* implicit iota of the same type */
-    )
-    // to stringize
-    func (s Season) String() string {
-        switch s {
-        case Summer:
-            return "summer"
-        case Autumn:
-            return "autumn"
-        }
-        return "Unk"
-    }
-    ```
-* nil represents non-existing pointer or reference-type (for slices, interface).
-
-
-### more notes
+## more notes on string literals
 
 * always utf-8
 * strings are immutable
@@ -130,6 +90,57 @@ if len(s) > 0 { ... }
 * The above isn't usually a problem to iterate over a string comparing it to individual
   runes(Atleast the ascii ones), as the non-ascii ones anyway dont compare equal.
 * Inside a program, you can convert a string(utf-8 encoded) to slice of runes
+
+## composite literal
+
+* Initializes a slice or a struct
+    ```go
+    var palette = []color.Color{color.White, color.Black}
+    anim := gif.GIF{LoopCount: nframes}
+    ```
+
+# consts
+
+* Constants are declared like variables, but with the const keyword. Constants
+  can be character, string, boolean, or numeric values.
+    ```go
+    const (
+        Summer int = 0
+        Winter int = 1
+    )
+    ```
+* The const value has to be compile time derivable.
+    * We can't have consts whose value are found at runtime.
+    * Constants cannot be declared using the := syntax.
+* Type info can be absent in the const declaration. In this case, its derived
+  from the literal. Or if we have a typename (typically from type declaration,
+  it can be used too). When type is absent, its untyped. So its of any one
+  flavor - boolean, int, rune, floating-point, complex, string.
+* can be package level or function level or at any block
+* iota is used for enumeration
+    * but the iota is very limited.
+    * Use it only if you dont care for the values
+    * You can start from some number or skip a number
+    * If you need explicit values dont use ioto and just assign.
+    ```go
+    type Season int64
+    const (                   /* enum is a type, followed by const assignments to that type */
+        Summer Season = iota
+        Winter                /* implicit iota of the same type */
+    )
+    // to stringize the enum
+    func (s Season) String() string {
+        switch s {
+        case Summer:
+            return "summer"
+        case Autumn:
+            return "autumn"
+        }
+        return "Unk"
+    }
+    ```
+* `nil` represents non-existing pointer or reference-type (for slices, interface).
+
 
 # Types
 
@@ -197,15 +208,6 @@ string   // zero val: empty string
 * bytes and runes can be type-casted to string.
 * int gets type-casted .. but is best avoided.
 
-
-## Pointers
-
-* Like c, * is used for type. `*T` is a pointer of type T. & is for getting a
-  variable's pointer, and `*var` is for deferencing or indirecting. However,
-  there is no pointer arithmetic in go.
-* Its okay to take pointers to struct members
-* Pointers are useful to pass by reference (like a slice that might be
-  modified in a function)
 
 ## arrays
 
@@ -475,7 +477,6 @@ pet := struct {
 
 ```
 
-
 ### methods
 
 * The object on which method is called is referred as receiver
@@ -494,8 +495,8 @@ pet := struct {
     * Compiler will implicitly make a T as *T if only *T is a receiver. However,
        when T is passed as-is as interface{} (Like to fmt.Printf), then there is
        no implicit conversion! So `(*T).String()` may not work!
-* its okay for a receiver to be nil
-
+* its okay for a receiver to be nil as long as its pointer type reciever, and
+  the method guards itself against that.
 
 
 ## channel
@@ -517,6 +518,7 @@ pet := struct {
 * interfaces are comparable (==) if the underlying type is comparable or if both are nil.
   Otherwise, comparing uncomparable types causes runtime panic. (So this is not caught at compile time)
 * convention - if there is only method, the interface name typicall ends in er. Eg: Matcher
+* idomatic go is to name the interface with a `-er` suffix.
 
 c-equivalent of `void*` is `interface{}`
 There is now a
@@ -532,6 +534,18 @@ type Processor[T any] interface {
 }
 ```
 
+## Pointers
+
+* Like c, * is used for type. `*T` is a pointer of type T. & is for getting a
+  variable's pointer, and `*var` is for deferencing or indirecting. However,
+  there is no pointer arithmetic in go.
+* Its okay to take pointers to struct members
+* Pointers are useful to pass by reference (like a slice that might be
+  modified in a function)
+* Note that idiomatic go is
+    * pass by pointer if you need to mute the value
+    * pass by value if you dont need to mute
+    * return by value
 
 # More on types
 
@@ -544,13 +558,6 @@ type Processor[T any] interface {
 * array compares true if size is same and each of underlying value is
   comparable and equal.
 
-## composite literal
-
-* Initializes a slice or a struct
-    ```go
-    var palette = []color.Color{color.White, color.Black}
-    anim := gif.GIF{LoopCount: nframes}
-    ```
 
 ## reference types
 
@@ -560,25 +567,21 @@ type Processor[T any] interface {
 * structures, arrays, interfaces that contain reference-type also kind of become
   referenced.
 
-## Aggregate type
-
-* arrays and structs
-
-## Interface types
-
-
 ## type declaration
 
 Used to create new types from existing types - although they share same representation
 they are different types
 
-    ```go
-    type newTypeName underlyingType
-    type Celcius float64
-    ```
+```go
+type newTypeName underlyingType
+type Celcius float64
+// this creates a function-type
+type HandlerFunc func(http.ResponseWriter, *http.Request)
+```
 
-Explicity type conversion is then used to covert one to another. Initialization however
-can be direct
+* Explicity type conversion is then used to covert one to another.
+    * one wont implicitly cast to the other
+* Initialization however can be direct from a literal
 
 ```go
 const boilingPoint Celcius = 100.0
@@ -593,18 +596,18 @@ Type names from basic-types are referred as named basic types. Eg. time.Duration
 * T(value) converts value to the type T
     ```go
     []rune("Hello World")
+
+    //native type are cast like in c
+    aUint64Int = uint64(aInt64Var)
     ```
 * Usually a new type is same as the other type, but defines extra methods so
   that it can be passed as interfaces. In such cases, you will see these
   type conversions done from type X to Y (although both types are internally
   same)
 
-### interface to concrete conversion
+## type-assertion
 
 ```go
-//native type are cast like in c
-aUint64Int = uint64(aInt64Var)
-
 // converts interface-i to a concrete type-T.
 // will panic is i is not of type T
 v = i.(T)
@@ -612,14 +615,26 @@ v = i.(T)
 // for safe cast
 // ok is true or false.
 v, ok = i.(T)
-```
 
-
-## type-assertion
-
-Not sure.. To read more on this
-```go
-v, ok = varName.(T)
+//switching on type
+func doThings(i interface{}) {
+    switch j := i.(type) {
+    case nil:
+        // i is nil, type of j is interface{}
+    case int:
+        // j is of type int
+    case MyInt:
+        // j is of type MyInt
+    case io.Reader:
+        // j is of type io.Reader
+    case string:
+        // j is a string
+    case bool, rune:
+        // i is either a bool or rune, so j is of type interface{}
+    default:
+        // no idea what i is, so j is of type interface{}
+    }
+}
 ```
 
 # Variables
@@ -833,16 +848,48 @@ v, ok = varName.(T)
 * we can have multiple values in a single case.
 * Switch without a condition is the same as switch true. This construct can be
   a clean way to write long if-then-else chains.
+    ```go
+    // a better if else
+    switch { // note not condition
+      case a > b:
+        //...
+      case c < d:
 
-## Defer
+    }
+    ```
+
+## defer
 
 * A defer statement defers the execution of a function until the surrounding
   function returns. The args to any function called, are however, evaulated
   immediately
 * Deferred function calls are pushed onto a stack. When a function returns, its
   deferred calls are executed in last-in-first-out order.
+  ```go
+    func main() {
+        if len(os.Args) < 2 {
+            log.Fatal("no file specified")
+        }
+        f, err := os.Open(os.Args[1])
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer f.Close()    // mind the () ... you pass args to the function via that.
+        data := make([]byte, 2048)
+        for {
+            count, err := f.Read(data)
+            os.Stdout.Write(data[:count])
+            if err != nil {
+                if err != io.EOF {
+                    log.Fatal(err)
+                }
+                break
+            }
+        }
+    }
+  ```
 
-# Functions
+# functions
 
 ```go
 func name(parameter-list) (result-list) {
@@ -872,6 +919,7 @@ func name(parameter-list) (result-list) {
         return
     }
     ```
+* go doesn't have named/optional params. If you need them use a struct as arg
 * functions associated with types are called methods. These sport the anchoring
   type in their declaration like this:
     ```go
@@ -881,14 +929,55 @@ func name(parameter-list) (result-list) {
 * variadic function have ellipsis at the last arg's type.
   This makes the funciton take any number of args of that type.
   Internally its accessible as a slice of that type.
+  ```go
+    func addTo(base int, vals ...int) []int {
+        out := make([]int, 0, len(vals))
+        for _, v := range vals {
+            out = append(out, base+v)
+        }
+        return out
+    }
+    // call
+    func main() {
+        fmt.Println(addTo(3))
+        fmt.Println(addTo(3, 2))
+        fmt.Println(addTo(3, 2, 4, 6, 8))
+        a := []int{4, 3}
+        fmt.Println(addTo(3, a...))  // expands the slice as individual int args
+        fmt.Println(addTo(3, []int{1, 2, 3, 4, 5}...))
+    }
+  ```
 * `...interface{}` makes the funciton take any type of arg any
   number of times.
+
+## anonymous functions
+
+* Useful as other function args, closures or in defer statements
+
+```go
+func main() {
+    for i := 0; i < 5; i++ {
+        func(j int) { // anonymous function
+                fmt.Println("printing", j, "from inside of an anonymous function")
+            }(i)
+        }
+    }
+}
+
+// sort by last name
+sort.Slice(people, func(i int, j int) bool {     // anonymous func and also a closure. Captures the people
+    return people[i].LastName < people[j].LastName
+    })
+
+```
+
 
 ## closures
 
 * go supports closures
 * Dont pass loop-vars to a function over a closure.
 * basically the closure gets a reference to the variables
+* see the slice sort example above
 
 ## go builtin functions
 
@@ -945,19 +1034,90 @@ func name(parameter-list) (result-list) {
 * recover
 
 
-# Popular types/interfaces
+# error
 
-## error
-
-* Is an interface type. nil implies no error.
+* definition
+    ```go
+    type error interface {
+        Error() string
+    }
+    ```
 * To generate a error:
   ```go
-  fmt.Errorf("Whatever went wrong:%d", int_arg)
+  err := errors.New("this is a new error")
+  err2 := fmt.Errorf("whatever went wrong:%d", int_arg)
   ```
+* Idiomatic go
+    * Dont start error strings with caps
+    * dont end them with punctuations
+* wrapping and unwrapping
+  ```go
+  // error struct should support this
+  func (eimpl ErrorImpl) Unwrap() error
+
+  //use %w to wrap another error
+  return fmt.Errorf("in my file, faced err:%w from lib", err)
+
+  // or use this
+  errors.Wrap(myerr, "read failed")
+
+  // to get the wrapped error.. nil if there is none or the err doesn't implement Unwrap
+  wrappederr := errors.Unwrap(err)
+  ```
+  * wrapped errors are called a error chain
+* Use `%+v` verb to print a error with its stack trace
+
+## sentinel errors
+
+* Errors which are expected to be checked against directly.
+
+```go
+retVal, err := function_with_sentinel_err(args)
+if err == ASentinelErr {
+
+}
+```
+* Sample
+```go
+func fileChecker(name string) error {
+    f, err := os.Open(name)
+    if err != nil {
+        return fmt.Errorf("in fileChecker: %w", err)
+    }
+    f.Close()
+    return nil
+}
+func main() {
+    err := fileChecker("not_here.txt")
+    if err != nil {
+        if errors.Is(err, os.ErrNotExist) {  // checks in the error Chain for this sentinel error
+            fmt.Println("That file doesn't exist")
+        }
+    }
+}
+
+```
+
+## panics
+
+* equivalent of assert
+```go
+panic("your message")
+
+```
+
+# Managing Go code
+
+* Go programmers typically keep all their Go code in a single workspace.
+* A workspace contains many version control repositories (managed by Git, for example).
+* Each repository contains one or more packages.
+* Each package consists of one or more Go source files in a single directory.
+  (open question: how does go compiler know where to look for when a variable is
+   not available in this file, but another file belonging to the same package?)
+* The path to a package's directory determines its import path.
 
 
-
-# Packages
+## Packages
 
 * Every Go program is made up of packages. Programs start running in package main.
 * By convention, the package name is the same as the last element of the import path
@@ -1006,19 +1166,6 @@ func name(parameter-list) (result-list) {
 * GOROOT/GOPATH will always be searched.
     * GOPATH can have multiple values like PATH
     * GOPATH/src is where source code lives.
-
-
-# Managing Go code
-
-* Go programmers typically keep all their Go code in a single workspace.
-* A workspace contains many version control repositories (managed by Git, for example).
-* Each repository contains one or more packages.
-* Each package consists of one or more Go source files in a single directory.
-  (open question: how does go compiler know where to look for when a variable is
-   not available in this file, but another file belonging to the same package?)
-* The path to a package's directory determines its import path.
-
-# Useful Statements
 
 
 # Packages in standard library
@@ -1094,6 +1241,8 @@ log.Fatal(stringvarorliteral)
 
 ## strconv
 
+* `intVar, err := strconv.Atoi(stringVar)`
+
 ### unicode/utf8
 
 * utf8.DecodeRuneInString - gets rune at a index i
@@ -1115,6 +1264,7 @@ log.Fatal(stringvarorliteral)
 
 ## io
 
+* io.EOF  // an error type
 * Discard - sth like /dev/null sink
 
 ## net/http
@@ -1218,6 +1368,8 @@ bits.Len32(x)                     // gives the number of bits required to repres
 ```sh
 go build         # creates a exe in same dir with same name as package main file name
 go build -o /path/to/exec file.go
+## other args
+## -trimpath   .. dont include fullpath in stack-traces
 go run file.go   # Just run as a script
 go install       # build, but put exe in $GOPATH/bin
 
