@@ -504,6 +504,50 @@ pet := struct {
 * communication mechanism
 * Is always of a given type
 
+```go
+//create a unbuffered channel
+ch := make(chan int)
+
+//create a buffered channel
+ch := make(chan int, 10)
+
+// read from a channel
+// ok if false if the channel is closed, or true
+v, ok := <-ch
+
+// write to a channel
+ch<- v
+
+// for-range loop
+// runs till channel is closed
+func runThingConcurrently(in <-chan int, out chan<- int) {
+    go func() {
+        for val := range in {
+            result := process(val)
+            out <- result
+        }
+    }()
+}
+
+// close a channel
+close(ch)
+```
+* select .. do any one of the cases, that is doalbe. Usually wrapped in a `for()`
+```go
+select {
+case v := <-ch:
+    fmt.Println(v)
+case v := <-ch2:
+    fmt.Println(v)
+case ch3 <- x:
+    fmt.Println("wrote", x)
+case <-ch4:
+    fmt.Println("got value on ch4, but ignored it")
+}
+```
+* If all go-coroutines are stopped , then go-runtime panics
+
+
 ## goroutine
 
 * concurrent function execution
@@ -525,6 +569,20 @@ There is now a
 ```go
 type any = interface{}
 ```
+
+### wrapping interfaces - embedded type pattern
+
+```go
+type nopCloser struct {
+    io.Reader
+}
+func (nopCloser) Close() error { return nil }
+func NopCloser(r io.Reader) io.ReadCloser {
+    return nopCloser{r}
+}
+
+```
+
 
 ## generics
 
@@ -590,6 +648,16 @@ freezingPoint = Celcius(someFloatVar)
 ```
 
 Type names from basic-types are referred as named basic types. Eg. time.Duration
+
+### aliases
+
+```go
+// For all intents and purposes, Bar is same as Foo
+// compiler allows to use them interchangeably
+type Bar = Foo
+
+```
+
 
 ## type-convertion
 
@@ -700,6 +768,10 @@ func doThings(i interface{}) {
 
 * comments are like cpp.
 * `//` for one line and `/* .. */` for multi line
+
+## godoc
+
+* `//` comments just above package or a function or a struct
 
 ## for
 
@@ -926,6 +998,9 @@ func name(parameter-list) (result-list) {
     func (m *MyType) methodFunc(args int) (result int) {
     }
     ```
+* Function calls can precede function declaration within the package. Unlike c,
+  there is no declaration/definition distinction. Its just one place and go
+  calls it declaration.
 * variadic function have ellipsis at the last arg's type.
   This makes the funciton take any number of args of that type.
   Internally its accessible as a slice of that type.
@@ -1108,13 +1183,65 @@ panic("your message")
 
 # Managing Go code
 
-* Go programmers typically keep all their Go code in a single workspace.
-* A workspace contains many version control repositories (managed by Git, for example).
-* Each repository contains one or more packages.
-* Each package consists of one or more Go source files in a single directory.
-  (open question: how does go compiler know where to look for when a variable is
-   not available in this file, but another file belonging to the same package?)
-* The path to a package's directory determines its import path.
+* Roughly
+```
+repository > module > packages > files
+```
+## repository
+
+* Is where the code lives - typically something that is source controlled
+* While you can keep multiple modules in one repo, practise is to have
+  one repository per module so that a module can be version controlled
+  on its own properly
+
+## modules
+
+* Globally identified by its repository's path and its name. Eg:
+    ```
+    github.com/some-company/some-project/module
+    ```
+* Module management commands
+
+```sh
+## create a new module giving its MODULE_PATH
+##   this creates a go.mod file
+go init mod public-domain.com/path/to/module/
+```
+
+* roughly how a go.com looks like
+    * the optional `require` captures the dependent pkgs
+    * a optional `exclude` section prevents a specific version
+      of a  module from begin used
+```
+module github.com/learning-go-book/money
+
+go 1.15
+
+require (
+    github.com/learning-go-book/formatter v0.0.0-20200921021027-5abc380940ae
+    github.com/shopspring/decimal v1.2.0
+)
+```
+* you might want to let go know that for now, modules are available locally
+    ```sh
+    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
+    ```
+* this (re)generates the mod file
+    ```sh
+    go mod tidy
+    ```
+* GOROOT/GOPATH will always be searched.
+    * GOPATH can have multiple values like PATH
+    * GOPATH/src is where source code lives.
+
+* Other module mgmt commands
+```sh
+## list all versions in a module
+go list -m -versions github.com/learning-go-book/simpletax
+
+## replace to a paraticular version -- note the @
+go get github.com/learning-go-book/simpletax@v1.0.0
+```
 
 
 ## Packages
@@ -1123,25 +1250,40 @@ panic("your message")
 * By convention, the package name is the same as the last element of the import path
     * This means, typically you put all files of a package in a folder
     * All files in a folder must have the same package name
-* package also gives a namespace like cpp. Like cpp, the same package(namespace) can be
-  spread across source-files. Each sourcefile calls out its package as its first line.
-  However, unlike cpp, one source file is fully one package only.
-* imports can be grouped into a parenthesized, "factored" import statement.
+        * Excpetion is main
+        * Or when dir name cant be a valid pkg name. (avoid this)
+* package can be spread across files (like namespaces in cpp)
+* Each sourcefile calls out its package as its first line.
+    * (unlike cpp) one source file is fully one package only.
+* import is how one file uses another package's identifiers. imports can be
+  grouped into a parenthesized, "factored" import statement.
   This is preferred over individual imports.
   ```go
   import (
+       //  importing from std library
       "fmt"
       "math"
+
+      // alternate name for a module in this file
+      // used to avoid conflicts if 2 modules have same name
+      crand "crypt/rand"
+
+      // import form other modules
+      // later used with just formatter.FunctionThere()
+      "github.com/whatever-repository/formatter"
   )
   import myhttp "mypath/http"
   ```
+  * imports have file scope only. If you want to import on 2 files of same package
+    you have import in both files
 * In Go, a name is exported if it begins with a capital letter. Otherwise its private
   to the package its in.
-* when doing a import "a/b", we can later just do b.VarFromB, as by convention, the
-  package in "a/b" would have been named b
-* Function calls can precede function declaration within the package. Unlike c, there is
-  no declaration/definition distinction. Its just one place and go calls it declaration.
-* init() is a special no-arg, no-return-type function that can appear any number of times
+* Avoid relative paths.
+
+## init
+
+* Avoid this if possible
+* `init()` is a special no-arg, no-return-type function that can appear any number of times
   in every file, in any package. These are called in declaraion order and are invoked
   before the package is considered initialized.
   init()s of all packages are called before main()
@@ -1151,21 +1293,6 @@ panic("your message")
   ```
   triggers a intialization of the package even if no references to the package is done.
   Otherwise compiler will complain of redundant import
-
-## module management
-
-* you create a new module with `go init mod public-domain.com/path/to/module/in/that/domain`
-* you might want to let go know that for now, modules are available locally
-    ```sh
-    go mod edit -replace public-domain.com/module/i/need/modA=../local/path/to/modA
-    ```
-* this generates the mod file
-    ```sh
-    go mod tidy
-    ```
-* GOROOT/GOPATH will always be searched.
-    * GOPATH can have multiple values like PATH
-    * GOPATH/src is where source code lives.
 
 
 # Packages in standard library
@@ -1177,7 +1304,8 @@ panic("your message")
 * os.Exit(1) - exit with a error code.
 
 ```go
-// open a file. file of type *File
+// open a file. file of type *os.File
+// that *File is a io.Reader, io.Writer
 file, err := os.Open(dataFile)
 if err != nil {
     return nil, err
@@ -1197,6 +1325,14 @@ if err != nil {
 
     fmt.Printf("Regular c style printing with formats:%d", i)
     ```
+
+```go
+type Stringer interface {
+    String() string
+}
+
+```
+
 
 ### Verbs
 
@@ -1237,6 +1373,7 @@ log.Fatal(stringvarorliteral)
 ## bytes
 
 * bytes.Buffer - efficient type for manipulation of []byte
+    * Implements the io.Writer and fmt.Stringer interface
     * bytes.Buffer.WriteByte()
 
 ## strconv
@@ -1261,11 +1398,53 @@ log.Fatal(stringvarorliteral)
 
 * ReadFile
     * Given a filename returns byte slice/err of file contents
-
-## io
-
 * io.EOF  // an error type
 * Discard - sth like /dev/null sink
+
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+type Closer interface {
+    Close() error
+}
+type Seeker interface {
+    Seek(offset int64, whence int) (int64, error)
+    // whence is one of io.SeekStart, io.SeekCurrent, and io.SeekEnd.
+}
+io.ReadCloser
+io.ReadSeeker
+io.ReadWriteCloser
+io.ReadWriteSeeker
+io.ReadWriter
+io.WriteCloser
+io.WriteSeeker
+
+// write/read in one slurp
+ioutil.ReadAll
+ioutil.ReadFile
+ioutil.WriteFile
+
+```
+
+* string to io.Reader:
+    ```go
+    s := "The quick brown fox jumped over the lazy dog"
+    sr := strings.NewReader(s)
+    ```
+* io.MultiReader
+    * gives a io.Reader from many io.Reader one after another
+* io.LimitReader
+    * gives a io.Reader that will stop reading after a limit num bytes
+* io.MultiWriter
+    * gives a io.Writer from many that will write to all at the same time
+
+
+
+
 
 ## net/http
 
@@ -1281,19 +1460,39 @@ time.Duration  // delta between 2 Time s. akine to datetime.timedelta of python
 
 // Duration constants
 time.Second
+time.Minute
 time.Hour
-a := 5 * time.Second
+a := 5 * time.Second // a is of type time.Duration
 
 var t time.Time = time.Now()      // gives the current time. search: now current epoch
 d := time.Until(t)                // gives the time.Duration from now till t
 n := now.Add(timeout)             // add (timeout time.Duration) in sections to now
 
+// time pkg constants for formats
+time.Day
+time.Month, Year, Hour, Minute, Second, Weekday,
+Clock (just hh:mm:ss)
+Date  (just yyyy-mm-dd)
+
+//compare time.Time
+After, Before, Equal
+
+
+// returns a channel that outputs once after said time
+time.After
+// returns a channel that outputs every perdiodic time
+// avoid-- as the ticker cannot be stopped/gc'ed.
+time.Tick
+// prefer this.. returns *time.Ticker
+// has the channel to read do and stop function
+time.NewTicker()
+// invoke a function after some time in its own go-routine
+time.Afterfunc()
 
 var h int = math.Floor(d.Hours()) // converts the duration to hours
 
 
 
-time.Afterfunc() // invoke a function after some time in its own go-routine!
 
 // time from epoch
 // the 64 is to tell give a int64
@@ -1361,6 +1560,63 @@ bits.Len32(x)                     // gives the number of bits required to repres
                                   // In other words, gives the 1-idx'ed MSB-1 position
 
 ```
+
+## context
+
+```go
+
+// basic context
+ctx := context.Background()
+
+// for http req
+ctx := req.Context()
+req = req.WithContext(ctx)
+
+// ctx with cancel
+ctx, cancel := context.WithCancel(ctx)
+defer cancel()
+
+// ctx with tiemout
+parent, cancel := context.WithTimeout(ctx, 2*time.Second)
+defer cancel()
+
+// ctx with Value
+func ContextWithUser(ctx context.Context, user string) context.Context {
+    return context.WithValue(ctx, key, user)
+}
+func UserFromContext(ctx context.Context) (string, bool) {
+    user, ok := ctx.Value(key).(string)
+    return user, ok
+}
+
+```
+
+* supprot context in your own code
+
+```go
+func longRunningThingManager(ctx context.Context, data string) (string, error) {
+    type wrapper struct {
+        result string
+        err error
+    }
+    ch := make(chan wrapper, 1)
+    go func() {
+        // do the long running thing
+        result, err := longRunningThing(ctx, data)
+        ch <- wrapper{result, err}
+    }()
+    select {
+    case data := <-ch:
+        return data.result, data.err
+    case <-ctx.Done():
+        return "", ctx.Err()
+    }
+}
+
+
+```
+
+
 
 
 # Go tools
