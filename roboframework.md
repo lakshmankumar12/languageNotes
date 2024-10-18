@@ -45,6 +45,8 @@ ${example_regex}=  catenate  SEPARATOR=
 ...  Setting IP forwarding kernel options
 
 
+## simple set
+${hi} =    Set Variable    Hello, world!
 ```
 
 
@@ -72,6 +74,7 @@ END
 
 &{args}=    Create Dictionary    serials=${devices_serial_no_list}
 
+## search: add dictionary
 Set To Dictionary    ${sas_curlParams}    cert=${sasemulator_crt}   key=${sasemulator_key}
 
 &{params}=    Copy Dictionary    ${onyxedge_orc8r_dict}
@@ -117,4 +120,11 @@ http://robotframework.org/SSHLibrary/SSHLibrary.html
 * Put File
 * Get File
 
+
+## sleep for some time
+
+```
+Sleep   20seconds
+
+```
 

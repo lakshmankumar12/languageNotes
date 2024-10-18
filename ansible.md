@@ -319,6 +319,13 @@ ansible -i hosts all -m setup -a "filter=ansible_eth0"
 * `setup` module can show this. This module is automatically run when a playbook is run.
 * are in json format.. so `{{<ansible_facts>}}` would work in the playbook.
 
+```yaml
+- name: Store IP of VM
+  set_fact:
+    vm_ip: "{{ result_get_ip.stdout }}"
+```
+
+
 
 
 # playbook

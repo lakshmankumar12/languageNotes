@@ -229,6 +229,19 @@ lastBit = x & -x
 https://www.gnu.org/software/libc/manual/html_node/Argp-Example-3.html
 https://stackoverflow.com/a/24479532
 
+# socket programming
+
+```cpp
+
+//raw socket for ethernet
+sockFd = socket(AF_PACKET, SOCK_RAW, IPPROTO_RAW);
+
+//raw socket for ip-packets
+sockFd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+
+```
+
+
 # common c snippets
 
 ## error printing

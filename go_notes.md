@@ -583,16 +583,7 @@ func NopCloser(r io.Reader) io.ReadCloser {
 
 ```
 
-
-## generics
-
-```go
-type Processor[T any] interface {
-    ProcessGrant(frequency int64, bandwidth int64) T
-}
-```
-
-## Pointers
+## pointers
 
 * Like c, * is used for type. `*T` is a pointer of type T. & is for getting a
   variable's pointer, and `*var` is for deferencing or indirecting. However,
@@ -604,6 +595,15 @@ type Processor[T any] interface {
     * pass by pointer if you need to mute the value
     * pass by value if you dont need to mute
     * return by value
+
+## generics
+
+```go
+type Processor[T any] interface {
+    ProcessGrant(frequency int64, bandwidth int64) T
+}
+```
+
 
 # More on types
 
@@ -1664,7 +1664,7 @@ go vet file.go
 
 ```
 
-# documentation
+## documentation
 
 * comments above any of packages, function, types and global vars
 
